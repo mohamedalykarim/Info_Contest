@@ -36,7 +36,7 @@ class AdminActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AdminActivityUI(viewModel)
+            LoginActivityUI(viewModel)
         }
 
         observe()
@@ -65,7 +65,7 @@ class AdminActivity : AppCompatActivity() {
 
 
 @Composable
-fun AdminActivityUI(viewModel: LoginViewModel) {
+fun LoginActivityUI(viewModel: LoginViewModel) {
     Column (modifier = Modifier
         .fillMaxSize()
         .background(

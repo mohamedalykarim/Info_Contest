@@ -7,4 +7,5 @@ import mohalim.alarm.infocontest.core.utils.DataState
 
 interface DatabaseRepository {
     fun login(username : String, password: String) : Flow<DataState<User>>
+    fun createQestion(question: Question) : Flow<DataState<Boolean>>
 }

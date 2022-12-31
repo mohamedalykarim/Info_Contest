@@ -33,6 +33,7 @@ android {
         }
     }
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -84,15 +85,6 @@ dependencies {
     kapt 'androidx.hilt:hilt-compiler:1.0.0'
     implementation "androidx.hilt:hilt-work:1.0.0"
 
-    // AWS dynamodb
-    implementation("aws.sdk.kotlin:dynamodb:0.9.4-beta")
-    implementation("aws.sdk.kotlin:sns:0.9.4-beta")  {
-        exclude group: "xmlpull", module: "xmlpull"
-    }
-
-
-
-
     // Room
     def room_version = "2.4.2"
     implementation "androidx.room:room-runtime:$room_version"
@@ -124,9 +116,15 @@ dependencies {
     implementation 'androidx.compose.runtime:runtime-livedata:1.1.1'
     implementation 'androidx.compose.runtime:runtime-rxjava2:1.1.1'
 
-    implementation 'com.amazonaws:aws-android-sdk-core:2.6.31'
-    implementation 'com.amazonaws:aws-android-sdk-ddb:2.6.31'
-    implementation 'com.amazonaws:aws-android-sdk-ddb-document:2.4.4'
-    implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
+    // Amplify plugins
+    implementation 'com.amplifyframework:core:2.0.0'
+    implementation 'com.amplifyframework:aws-api:2.0.0'
+    implementation 'com.amplifyframework:aws-datastore:2.0.0'
+    implementation 'com.amplifyframework:aws-auth-cognito:2.0.0'
+
+
+    // Support for Java 8 features
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
 }
+
