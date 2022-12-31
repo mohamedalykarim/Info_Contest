@@ -1,0 +1,6 @@
+{
+  "AppSyncApiName": "CulturalContestApplication",
+  "DynamoDBBillingMode": "PAY_PER_REQUEST",
+  "DynamoDBEnableServerSideEncryption": false,
+  "AuthModeLastUpdated": "2022-12-31T13:43:21.801Z"
+}

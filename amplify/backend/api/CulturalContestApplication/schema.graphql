@@ -1,0 +1,20 @@
+type Users @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  userName: String
+  password: String
+  points: Int
+  userGroup: Int
+}
+
+type Questions @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  type: Int
+  questionText: String
+  answer1: String
+  answer2: String
+  answer3: String
+  answer4: String
+  correctAnswer: String
+  comment: String
+}
+ 

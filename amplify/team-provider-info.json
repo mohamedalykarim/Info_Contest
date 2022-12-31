@@ -1,0 +1,23 @@
+{
+  "staging": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-culturalcontestappli-staging-92311-authRole",
+      "UnauthRoleArn": "arn:aws:iam::036256521064:role/amplify-culturalcontestappli-staging-92311-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::036256521064:role/amplify-culturalcontestappli-staging-92311-authRole",
+      "Region": "eu-west-2",
+      "DeploymentBucketName": "amplify-culturalcontestappli-staging-92311-deployment",
+      "UnauthRoleName": "amplify-culturalcontestappli-staging-92311-unauthRole",
+      "StackName": "amplify-culturalcontestappli-staging-92311",
+      "StackId": "arn:aws:cloudformation:eu-west-2:036256521064:stack/amplify-culturalcontestappli-staging-92311/bf49fd30-88ec-11ed-a9d7-0a94ce6a31ae",
+      "AmplifyAppId": "d3t6fa4xfyzxww"
+    },
+    "categories": {
+      "auth": {
+        "culturalcontestapplia562ccd4": {}
+      },
+      "api": {
+        "CulturalContestApplication": {}
+      }
+    }
+  }
+}
