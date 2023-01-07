@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.amplifyframework.auth.result.AuthSignInResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import mohalim.alarm.infocontest.core.model.user.User
@@ -14,8 +15,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(val databaseRepository: DatabaseRepository) : ViewModel() {
 
-    private val _userDataState : MutableLiveData<DataState<User>> = MutableLiveData()
-    val userDataState : LiveData<DataState<User>> get() = _userDataState
+    private val _userDataState : MutableLiveData<DataState<AuthSignInResult>> = MutableLiveData()
+    val userDataState : LiveData<DataState<AuthSignInResult>> get() = _userDataState
 
 
     fun login(username: String, password: String) {

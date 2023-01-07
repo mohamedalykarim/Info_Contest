@@ -16,9 +16,11 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import dagger.hilt.android.AndroidEntryPoint
 import mohalim.alarm.infocontest.R
 import mohalim.alarm.infocontest.ui.login.LoginViewModel
 
+@AndroidEntryPoint
 class AdminActivity : AppCompatActivity() {
     val viewModel : AdminViewModel by viewModels()
 
