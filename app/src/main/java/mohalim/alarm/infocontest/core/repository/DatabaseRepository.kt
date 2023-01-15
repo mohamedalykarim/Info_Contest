@@ -6,6 +6,6 @@ import mohalim.alarm.infocontest.core.model.question.Question
 import mohalim.alarm.infocontest.core.utils.DataState
 
 interface DatabaseRepository {
-    fun login(username : String, password: String) : Flow<DataState<AuthSignInResult>>
-    fun createQestion(question: Question) : Flow<DataState<Boolean>>
+    suspend fun login(username : String, password: String) : DataState<AuthSignInResult>
+    suspend fun createQestion(question: Question) : Flow<DataState<Boolean>>
 }

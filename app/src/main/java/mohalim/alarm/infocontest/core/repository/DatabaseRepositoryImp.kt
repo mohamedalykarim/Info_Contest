@@ -4,43 +4,46 @@ import android.util.Log
 import com.amplifyframework.auth.result.AuthSignInResult
 import com.amplifyframework.auth.result.step.AuthSignInStep
 import com.amplifyframework.core.Amplify
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import mohalim.alarm.infocontest.core.data_source.aws.AWSDatabase
 import javax.inject.Inject
 
 import com.amplifyframework.datastore.generated.model.Questions
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.flow.*
 import mohalim.alarm.infocontest.core.model.question.Question
 import mohalim.alarm.infocontest.core.model.user.User
 import mohalim.alarm.infocontest.core.utils.DataState
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 
 class DatabaseRepositoryImp @Inject constructor(
     val data : AWSDatabase
 ) : DatabaseRepository {
 
-    override fun login(username: String, password: String): Flow<DataState<AuthSignInResult>> {
-        return flow {
+    override suspend fun login(username: String, password: String): DataState<AuthSignInResult> = suspendCoroutine {continuation->
 
-            try {
-                Amplify.Auth.signIn("mohamed.aly.karim", "Lh@123456",
-                    { result ->
-                        flow{
-                            emit(DataState.Success(result))
-                        }
-                    },
-                    { Log.e("AuthQuickstart", "Failed to sign in", it) }
-                )
+        try {
+            Amplify.Auth.signIn(username, password,
+                { result ->
+                    continuation.resume(DataState.Success(result))
+                },
+                {
+                    continuation.resume(DataState.Failure(it))
+                    Log.e("AuthQuickstart", "Failed to sign in", it)
+                }
+            )
 
-            }catch (e : Exception){
-                emit(DataState.Failure(e))
-            }
-        }.flowOn(Dispatchers.IO)
+        }catch (e : Exception){
+            continuation.resume(DataState.Failure(e))
+        }
+
+
     }
 
-    override fun createQestion(question: Question): Flow<DataState<Boolean>> {
+    override suspend fun createQestion(question: Question): Flow<DataState<Boolean>> {
         return flow<DataState<Boolean>> {
             try {
 

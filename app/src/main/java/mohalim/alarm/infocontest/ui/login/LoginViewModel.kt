@@ -1,5 +1,6 @@
 package mohalim.alarm.infocontest.ui.login
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -21,10 +22,11 @@ class LoginViewModel @Inject constructor(val databaseRepository: DatabaseReposit
 
     fun login(username: String, password: String) {
         viewModelScope.launch {
-            databaseRepository.login(username,password).collect{
-                _userDataState.value = it
-            }
+            val result = databaseRepository.login(username,password)
+            _userDataState.value = result
         }
-
     }
+
+
+
 }

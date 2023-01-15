@@ -1,5 +1,6 @@
 package mohalim.alarm.infocontest.ui.login
 
+import android.content.Intent
 import android.graphics.Color.parseColor
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -26,13 +27,16 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Observer
 import com.amplifyframework.auth.result.step.AuthSignInStep
+import com.amplifyframework.core.Amplify
 import dagger.hilt.android.AndroidEntryPoint
 import mohalim.alarm.infocontest.R
 import mohalim.alarm.infocontest.core.utils.DataState
+import mohalim.alarm.infocontest.ui.admin.AdminActivity
 import mohalim.alarm.infocontest.ui.main.HomeViewModel
+import mohalim.alarm.infocontest.ui.quiz.QuizActivity
 
 @AndroidEntryPoint
-class AdminActivity : AppCompatActivity() {
+class LoginActivity : AppCompatActivity() {
     val viewModel : LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,6 +46,22 @@ class AdminActivity : AppCompatActivity() {
         }
 
         observe()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        Amplify.Auth.fetchAuthSession(
+            {
+                if(it.isSignedIn){
+                    val intent = Intent(this@LoginActivity, AdminActivity::class.java)
+                    this.finish()
+                    startActivity(intent)
+
+                }
+            },
+            { error -> Log.e("AmplifyQuickstart", "Failed to fetch auth session", error) }
+        )
     }
 
 
@@ -90,6 +110,9 @@ class AdminActivity : AppCompatActivity() {
                         AuthSignInStep.DONE -> {
                             Log.i("AuthQuickstart", "SignIn complete")
                             // User has successfully signed in to the app
+                            val intent = Intent(this, AdminActivity::class.java)
+                            startActivity(intent)
+                            finish()
                         }
                     }
                 }
