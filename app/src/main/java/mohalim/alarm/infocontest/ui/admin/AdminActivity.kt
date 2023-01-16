@@ -29,6 +29,7 @@ import com.amplifyframework.auth.cognito.result.AWSCognitoAuthSignOutResult
 import com.amplifyframework.core.Amplify
 import dagger.hilt.android.AndroidEntryPoint
 import mohalim.alarm.infocontest.R
+import mohalim.alarm.infocontest.ui.add_question.AddQuestionActivity
 import mohalim.alarm.infocontest.ui.login.LoginViewModel
 import mohalim.alarm.infocontest.ui.main.MainActivity
 
@@ -110,7 +111,10 @@ fun AdminActivityUI(viewModel: AdminViewModel, context: Activity) {
                 .padding(all = 16.dp)
                 .align(alignment = Alignment.BottomEnd),
 
-            onClick = { /*TODO*/ }
+            onClick = {
+                val intent = Intent(context, AddQuestionActivity::class.java)
+                context.startActivity(intent)
+            }
         ) {
             Icon(imageVector = Icons.Filled.Add, contentDescription = "Add")
         }
