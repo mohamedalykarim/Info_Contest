@@ -4,6 +4,7 @@ import android.graphics.Color.parseColor
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Space
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
@@ -35,6 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import dagger.hilt.android.AndroidEntryPoint
+import mohalim.alarm.infocontest.core.model.question.Question
+import mohalim.alarm.infocontest.core.utils.DataState
 
 @AndroidEntryPoint
 class AddQuestionActivity : AppCompatActivity() {
@@ -44,18 +47,45 @@ class AddQuestionActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent { AddQuestionUI(viewModel, this) }
     }
+
+    override fun onResume() {
+        super.onResume()
+
+        observe()
+    }
+
+    private fun observe() {
+        viewModel.addQuestionDataState.observe(this) {
+            when (it) {
+                is DataState.Loading->{}
+                is DataState.Success->{
+                    Toast.makeText(this, "Added", Toast.LENGTH_LONG).show()
+                    finish()
+                }
+                is DataState.Failure->{}
+            }
+
+        }
+    }
 }
+
 
 @Composable
 fun AddQuestionUI(viewModel: AddQuestionViewModel, addQuestionActivity: AddQuestionActivity) {
-    var questionType by remember { mutableStateOf(TextFieldValue("")) }
+    var questionType by remember { mutableStateOf(1) }
     var questionText by remember { mutableStateOf(TextFieldValue("")) }
     var answer1 by remember { mutableStateOf(TextFieldValue("")) }
     var answer2 by remember { mutableStateOf(TextFieldValue("")) }
     var answer3 by remember { mutableStateOf(TextFieldValue("")) }
     var answer4 by remember { mutableStateOf(TextFieldValue("")) }
-    var correctAnswer by remember { mutableStateOf(TextFieldValue("")) }
+    var correctAnswer by remember { mutableStateOf("") }
     var comment by remember { mutableStateOf(TextFieldValue("")) }
+
+    var expanded by remember { mutableStateOf(false) }
+    val list = listOf("Capitals", "History", "Geography", "Literature", "Sports", "Science")
+    var selectedItem by remember { mutableStateOf("") }
+    var textFieldSize by remember { mutableStateOf(Size.Zero) }
+
 
     Column (modifier = Modifier
         .fillMaxSize()
@@ -78,6 +108,7 @@ fun AddQuestionUI(viewModel: AddQuestionViewModel, addQuestionActivity: AddQuest
 
         {
 
+            /* Title of the screen */
             Text(
                 text = "Add New Question !!",
                 Modifier
@@ -88,10 +119,6 @@ fun AddQuestionUI(viewModel: AddQuestionViewModel, addQuestionActivity: AddQuest
                 fontSize = 30.sp
             )
 
-            var expanded by remember { mutableStateOf(false) }
-            val list = listOf("Capitals", "History", "Geography", "Literature", "Sports", "Science")
-            var selectedItem by remember { mutableStateOf("") }
-            var textFieldSize by remember { mutableStateOf(Size.Zero) }
 
             val icon = if (expanded) {
                 Icons.Filled.KeyboardArrowUp
@@ -103,6 +130,8 @@ fun AddQuestionUI(viewModel: AddQuestionViewModel, addQuestionActivity: AddQuest
                 modifier = Modifier.padding(10.dp).fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+
+
                 OutlinedTextField(
                     value = selectedItem,
                     onValueChange = { it },
@@ -135,6 +164,16 @@ fun AddQuestionUI(viewModel: AddQuestionViewModel, addQuestionActivity: AddQuest
                         DropdownMenuItem(onClick = {
                             selectedItem = label
                             expanded = false
+
+                            when(label){
+                                "Capitals" ->{ questionType = 1 }
+                                "History" ->{ questionType = 2 }
+                                "Geography" ->{ questionType = 3 }
+                                "Literature" ->{ questionType = 4 }
+                                "Sports" ->{ questionType = 5 }
+                                "Science" ->{ questionType = 6 }
+                            }
+
                         })
                         {
 
@@ -266,7 +305,7 @@ fun AddQuestionUI(viewModel: AddQuestionViewModel, addQuestionActivity: AddQuest
 
 
                 val options = listOf(
-                    "Answer one",
+                    "Answer One",
                     "Answer Two",
                     "Answer Three",
                     "Answer Four",
@@ -305,6 +344,16 @@ fun AddQuestionUI(viewModel: AddQuestionViewModel, addQuestionActivity: AddQuest
                                         ),
                                     )
                                     .clickable {
+                                        if (text === "Answer One"){
+                                            correctAnswer = answer1.text
+                                        }else if (text === "Answer Two"){
+                                            correctAnswer = answer2.text
+                                        }else if (text === "Answer Three"){
+                                            correctAnswer = answer3.text
+                                        }else if (text === "Answer Four"){
+                                            correctAnswer = answer4.text
+                                        }
+
                                         onSelectionChange(text)
                                     }
                                     .background(
@@ -325,8 +374,26 @@ fun AddQuestionUI(viewModel: AddQuestionViewModel, addQuestionActivity: AddQuest
 
                 Button(
                     onClick = {
-                        //your onclick code here
-                    }, elevation = ButtonDefaults.elevation(
+
+                        val question = Question(
+                            id = "",
+                            type = questionType,
+                            questionText = questionText.text,
+                            answer1 = answer1.text,
+                            answer2 = answer2.text,
+                            answer3 = answer3.text,
+                            answer4 = answer4.text,
+                            correctAnswer = correctAnswer,
+                            comment = comment.text,
+                            isAnswered = false
+                        )
+
+                        viewModel.addQuestion(
+                            question
+                        )
+
+                    },
+                    elevation = ButtonDefaults.elevation(
                         defaultElevation = 10.dp,
                         pressedElevation = 15.dp,
                         disabledElevation = 0.dp

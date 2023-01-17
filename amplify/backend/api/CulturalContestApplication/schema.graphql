@@ -16,5 +16,6 @@ type Questions @model @auth(rules: [{allow: public}]) {
   answer4: String
   correctAnswer: String
   comment: String
+  timeAddedToDatabase: Float
 }
  

@@ -1,7 +1,7 @@
 package mohalim.alarm.infocontest.core.model.question
 
 data class Question(
-    var id : Int,
+    var id : String,
     var type: Int,
     var questionText : String,
     var answer1 : String,

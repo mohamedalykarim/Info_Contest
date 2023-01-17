@@ -29,9 +29,12 @@ class RepositoryModule {
     @Singleton
     @Provides
     fun provideDatabaseRepository(
+        questionDao: QuestionDao,
+        questionCacheMapper: QuestionCacheMapper,
+
         data : AWSDatabase
     ) : DatabaseRepository {
-        return DatabaseRepositoryImp(data)
+        return DatabaseRepositoryImp(questionDao, questionCacheMapper, data)
     }
 
 }

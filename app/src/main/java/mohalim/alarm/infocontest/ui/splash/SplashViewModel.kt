@@ -1,6 +1,7 @@
 package mohalim.alarm.infocontest.ui.splash
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -10,16 +11,16 @@ import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mohalim.alarm.infocontest.core.service.RetreiveQuestionWorkManager
+import mohalim.alarm.infocontest.core.service.RetreiveQuestionWorkManager.Companion.Progress
 import javax.inject.Inject
 
 @HiltViewModel
 class SplashViewModel @Inject constructor() : ViewModel() {
 
-    private val _loadingProgress : MutableLiveData<String> = MutableLiveData()
-    val loadingProgress : LiveData<String> get() = _loadingProgress
+    private val _loadingProgress : MutableLiveData<Int> = MutableLiveData()
+    val loadingProgress : LiveData<Int> get() = _loadingProgress
 
 
-    var loadingText = "";
 
 
     fun retrieveDataToSqliteDatabase(context: Context) {
@@ -29,9 +30,13 @@ class SplashViewModel @Inject constructor() : ViewModel() {
         workManager.enqueue(request)
 
         workManager.getWorkInfoByIdLiveData(request.id)
-            .observe(context as LifecycleOwner) {
-                loadingText = it.progress.getString("Progress_Message").toString()
-                _loadingProgress.value = loadingText
+            .observe(context as LifecycleOwner) {workInfo->
+                if (workInfo != null) {
+                    val progress = workInfo.progress
+                    val value = progress.getInt(Progress, 0)
+                    _loadingProgress.value = value
+                }
+
             }
     }
 

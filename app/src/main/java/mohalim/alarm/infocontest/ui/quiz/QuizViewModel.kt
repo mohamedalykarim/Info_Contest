@@ -15,7 +15,7 @@ import javax.inject.Inject
 class QuizViewModel @Inject constructor(val repositoryImp: QuestionRepositoryImp) : ViewModel(){
 
     var currentQuestion = Question(
-        1,
+        "",
         1,
         "Loading...",
         "Loading...",

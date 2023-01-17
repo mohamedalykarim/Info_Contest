@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 data class QuestionCache(
     @PrimaryKey
     @ColumnInfo(name = "id")
-    var id : Int,
+    var id : String,
 
     @ColumnInfo(name = "type")
     var type : Int,

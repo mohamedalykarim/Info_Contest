@@ -50,13 +50,11 @@ class SplashActivity : AppCompatActivity() {
 
     private fun subscribeObservers() {
         viewModel.loadingProgress.observe(this) {
-            if (it == "null") return@observe
-            if (it == "تم التحميل") {
+            if (it == 100) {
                 val intent = Intent(this@SplashActivity, MainActivity::class.java)
                 startActivity(intent)
                 finish()
             }
-            binding.loadingTV.text = it
         }
     }
 

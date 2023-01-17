@@ -34,6 +34,7 @@ public final class Questions implements Model {
   public static final QueryField ANSWER4 = field("Questions", "answer4");
   public static final QueryField CORRECT_ANSWER = field("Questions", "correctAnswer");
   public static final QueryField COMMENT = field("Questions", "comment");
+  public static final QueryField TIME_ADDED_TO_DATABASE = field("Questions", "timeAddedToDatabase");
   private final @ModelField(targetType="ID", isRequired = true) String id;
   private final @ModelField(targetType="Int") Integer type;
   private final @ModelField(targetType="String") String questionText;
@@ -43,6 +44,7 @@ public final class Questions implements Model {
   private final @ModelField(targetType="String") String answer4;
   private final @ModelField(targetType="String") String correctAnswer;
   private final @ModelField(targetType="String") String comment;
+  private final @ModelField(targetType="Float") Double timeAddedToDatabase;
   private @ModelField(targetType="AWSDateTime", isReadOnly = true) Temporal.DateTime createdAt;
   private @ModelField(targetType="AWSDateTime", isReadOnly = true) Temporal.DateTime updatedAt;
   public String resolveIdentifier() {
@@ -85,6 +87,10 @@ public final class Questions implements Model {
       return comment;
   }
   
+  public Double getTimeAddedToDatabase() {
+      return timeAddedToDatabase;
+  }
+  
   public Temporal.DateTime getCreatedAt() {
       return createdAt;
   }
@@ -93,7 +99,7 @@ public final class Questions implements Model {
       return updatedAt;
   }
   
-  private Questions(String id, Integer type, String questionText, String answer1, String answer2, String answer3, String answer4, String correctAnswer, String comment) {
+  private Questions(String id, Integer type, String questionText, String answer1, String answer2, String answer3, String answer4, String correctAnswer, String comment, Double timeAddedToDatabase) {
     this.id = id;
     this.type = type;
     this.questionText = questionText;
@@ -103,6 +109,7 @@ public final class Questions implements Model {
     this.answer4 = answer4;
     this.correctAnswer = correctAnswer;
     this.comment = comment;
+    this.timeAddedToDatabase = timeAddedToDatabase;
   }
   
   @Override
@@ -122,6 +129,7 @@ public final class Questions implements Model {
               ObjectsCompat.equals(getAnswer4(), questions.getAnswer4()) &&
               ObjectsCompat.equals(getCorrectAnswer(), questions.getCorrectAnswer()) &&
               ObjectsCompat.equals(getComment(), questions.getComment()) &&
+              ObjectsCompat.equals(getTimeAddedToDatabase(), questions.getTimeAddedToDatabase()) &&
               ObjectsCompat.equals(getCreatedAt(), questions.getCreatedAt()) &&
               ObjectsCompat.equals(getUpdatedAt(), questions.getUpdatedAt());
       }
@@ -139,6 +147,7 @@ public final class Questions implements Model {
       .append(getAnswer4())
       .append(getCorrectAnswer())
       .append(getComment())
+      .append(getTimeAddedToDatabase())
       .append(getCreatedAt())
       .append(getUpdatedAt())
       .toString()
@@ -158,6 +167,7 @@ public final class Questions implements Model {
       .append("answer4=" + String.valueOf(getAnswer4()) + ", ")
       .append("correctAnswer=" + String.valueOf(getCorrectAnswer()) + ", ")
       .append("comment=" + String.valueOf(getComment()) + ", ")
+      .append("timeAddedToDatabase=" + String.valueOf(getTimeAddedToDatabase()) + ", ")
       .append("createdAt=" + String.valueOf(getCreatedAt()) + ", ")
       .append("updatedAt=" + String.valueOf(getUpdatedAt()))
       .append("}")
@@ -186,6 +196,7 @@ public final class Questions implements Model {
       null,
       null,
       null,
+      null,
       null
     );
   }
@@ -199,7 +210,8 @@ public final class Questions implements Model {
       answer3,
       answer4,
       correctAnswer,
-      comment);
+      comment,
+      timeAddedToDatabase);
   }
   public interface BuildStep {
     Questions build();
@@ -212,6 +224,7 @@ public final class Questions implements Model {
     BuildStep answer4(String answer4);
     BuildStep correctAnswer(String correctAnswer);
     BuildStep comment(String comment);
+    BuildStep timeAddedToDatabase(Double timeAddedToDatabase);
   }
   
 
@@ -225,6 +238,7 @@ public final class Questions implements Model {
     private String answer4;
     private String correctAnswer;
     private String comment;
+    private Double timeAddedToDatabase;
     @Override
      public Questions build() {
         String id = this.id != null ? this.id : UUID.randomUUID().toString();
@@ -238,7 +252,8 @@ public final class Questions implements Model {
           answer3,
           answer4,
           correctAnswer,
-          comment);
+          comment,
+          timeAddedToDatabase);
     }
     
     @Override
@@ -289,6 +304,12 @@ public final class Questions implements Model {
         return this;
     }
     
+    @Override
+     public BuildStep timeAddedToDatabase(Double timeAddedToDatabase) {
+        this.timeAddedToDatabase = timeAddedToDatabase;
+        return this;
+    }
+    
     /**
      * @param id id
      * @return Current Builder instance, for fluent method chaining
@@ -301,7 +322,7 @@ public final class Questions implements Model {
   
 
   public final class CopyOfBuilder extends Builder {
-    private CopyOfBuilder(String id, Integer type, String questionText, String answer1, String answer2, String answer3, String answer4, String correctAnswer, String comment) {
+    private CopyOfBuilder(String id, Integer type, String questionText, String answer1, String answer2, String answer3, String answer4, String correctAnswer, String comment, Double timeAddedToDatabase) {
       super.id(id);
       super.type(type)
         .questionText(questionText)
@@ -310,7 +331,8 @@ public final class Questions implements Model {
         .answer3(answer3)
         .answer4(answer4)
         .correctAnswer(correctAnswer)
-        .comment(comment);
+        .comment(comment)
+        .timeAddedToDatabase(timeAddedToDatabase);
     }
     
     @Override
@@ -351,6 +373,11 @@ public final class Questions implements Model {
     @Override
      public CopyOfBuilder comment(String comment) {
       return (CopyOfBuilder) super.comment(comment);
+    }
+    
+    @Override
+     public CopyOfBuilder timeAddedToDatabase(Double timeAddedToDatabase) {
+      return (CopyOfBuilder) super.timeAddedToDatabase(timeAddedToDatabase);
     }
   }
   
