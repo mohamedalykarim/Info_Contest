@@ -40,12 +40,12 @@ class QuizViewModel @Inject constructor(val repositoryImp: QuestionRepositoryImp
     fun retrieveQuestionForQuiz(type: Int, binding: ActivityQuizBinding) {
         viewModelScope.launch {
             repositoryImp.getQuestionsForQuiz(type).collect {
+                if (it.isEmpty())return@collect
                 currentQuestion = it[0]
                 questions.addAll(it)
 
                 binding.invalidateAll()
 
-                Log.d("TAG", "retrieveQuestionForQuiz: "+ currentQuestion.questionText)
             }
         }
     }

@@ -8,6 +8,7 @@ import mohalim.alarm.infocontest.core.data_source.aws.AWSDatabase
 import javax.inject.Inject
 
 import com.amplifyframework.datastore.generated.model.Questions
+import kotlinx.coroutines.delay
 import mohalim.alarm.infocontest.core.data_source.room.QuestionDao
 import mohalim.alarm.infocontest.core.model.question.Question
 import mohalim.alarm.infocontest.core.model.question.QuestionCacheMapper
@@ -71,15 +72,16 @@ class DatabaseRepositoryImp @Inject constructor(
 
     }
 
-    override suspend fun getNewQuestions(lastRetrieveTime : Double): DataState<List<Question>> = suspendCoroutine {
+    override suspend fun getNewQuestions(lastRetrieveTime: Long): DataState<List<Question>> = suspendCoroutine {
         try {
             Amplify.DataStore.query(
                 Questions::class.java,
-                Where.matches(Questions.TIME_ADDED_TO_DATABASE.gt(0)),
-                {questionsData->
+                Where.matches(Questions.TIME_ADDED_TO_DATABASE.gt(lastRetrieveTime)),
+                {data->
                     val questions = mutableListOf<Question>()
-                    while (questionsData.hasNext()){
-                        val questionData = questionsData.next()
+                    while (data.hasNext()){
+                        val questionData = data.next()
+
                         questions.add(
                             Question(
                                 questionData.id,

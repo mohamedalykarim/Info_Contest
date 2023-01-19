@@ -8,5 +8,5 @@ import mohalim.alarm.infocontest.core.utils.DataState
 interface DatabaseRepository {
     suspend fun login(username : String, password: String) : DataState<AuthSignInResult>
     suspend fun addQuestion(question: Question): DataState<Boolean>
-    suspend fun getNewQuestions(lastRetrieveTime : Double) : DataState<List<Question>>
+    suspend fun getNewQuestions(lastRetrieveTime : Long) : DataState<List<Question>>
 }
