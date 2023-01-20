@@ -32,16 +32,10 @@ class QuizActivity : AppCompatActivity() {
         val type =  intent.getIntExtra(QUIZ_TYPE, 1)
         binding.viewmodel = viewModel
 
-        if (type > 1){
-            Toast.makeText(this, "Soon, You can try capitals quiz", Toast.LENGTH_SHORT).show()
-            finish()
-            return
-        }
-
         initTitle(type)
         clicks()
 
-        viewModel.retrieveQuestionForQuiz(type, binding)
+        viewModel.retrieveQuestionForQuiz(type, binding, this)
 
 
     }

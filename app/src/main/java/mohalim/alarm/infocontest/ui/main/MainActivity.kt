@@ -30,10 +30,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this,R.layout.activity_main)
 
-
-
         clicks()
-
     }
 
 
@@ -114,6 +111,7 @@ class MainActivity : AppCompatActivity() {
         val intent : Intent = Intent(this@MainActivity, QuizActivity::class.java)
         intent.putExtra(QUIZ_TYPE, type)
         startActivity(intent)
+
     }
 
 

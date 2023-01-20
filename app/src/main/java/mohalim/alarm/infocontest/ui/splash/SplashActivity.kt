@@ -8,6 +8,9 @@ import android.util.Log
 import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import mohalim.alarm.infocontest.R
 import mohalim.alarm.infocontest.core.utils.IPreferenceHelper
 import mohalim.alarm.infocontest.core.utils.PreferencesUtils
@@ -28,18 +31,34 @@ class SplashActivity : AppCompatActivity() {
 
         retrieveDataToSqliteDatabase()
 
-
         subscribeObservers()
     }
 
     private fun subscribeObservers() {
         viewModel.loadingProgress.observe(this) {
             Log.d("TAG", "subscribeObservers: "+it)
-            if (it == 100) {
+            if (it == null) return@observe
+
+            if (it.isNotEmpty()){
                 val intent = Intent(this@SplashActivity, MainActivity::class.java)
                 startActivity(intent)
                 finish()
+            }else{
+                val counter = object : CountDownTimer(1000,1000){
+                    override fun onTick(p0: Long) {
+                    }
+
+                    override fun onFinish() {
+                        retrieveDataToSqliteDatabase()
+                    }
+
+                }
+                counter.start()
+
             }
+
+
+
         }
     }
 

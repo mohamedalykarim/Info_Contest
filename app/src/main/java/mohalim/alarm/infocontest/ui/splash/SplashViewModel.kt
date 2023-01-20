@@ -34,8 +34,8 @@ class SplashViewModel @Inject constructor(
 
     ) : ViewModel() {
 
-    private val _loadingProgress : MutableLiveData<Int> = MutableLiveData()
-    val loadingProgress : LiveData<Int> get() = _loadingProgress
+    private val _loadingProgress : MutableLiveData<List<Question>?> = MutableLiveData()
+    val loadingProgress : LiveData<List<Question>?> get() = _loadingProgress
 
 
     val LAST_RETRIEVE_TIME = longPreferencesKey("LAST_RETRIEVE_TIME")
@@ -67,7 +67,8 @@ class SplashViewModel @Inject constructor(
 
                     // done
                     withContext(Dispatchers.Main) {
-                        _loadingProgress.value = 100
+                        _loadingProgress.value = result.data
+
                     }
 
                 }
