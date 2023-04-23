@@ -13,10 +13,9 @@ android {
         applicationId "mohalim.alarm.infocontest"
         minSdk 24
         targetSdk 33
-        versionCode 3
-        versionName "1.03"
+        versionCode 4
+        versionName "1.04"
         multiDexEnabled true
-
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
