@@ -11,6 +11,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import mohalim.alarm.infocontest.BuildConfig
 import mohalim.alarm.infocontest.R
 import mohalim.alarm.infocontest.core.utils.IPreferenceHelper
 import mohalim.alarm.infocontest.core.utils.PreferencesUtils
@@ -24,14 +25,16 @@ class SplashActivity : AppCompatActivity() {
 
     private val preferenceHelper: IPreferenceHelper by lazy { PreferencesUtils(this) }
 
+    companion object{
+        const val SHEET_ID = "1Cbxmze6bIsyse-enXd-vjqZUoC8NcwPNYlPzW07LZQU"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_splash)
 
         retrieveDataToSqliteDatabase()
-
-        subscribeObservers()
+        viewModel.getDataFromGoogleSheet(BuildConfig.API_KEY, SHEET_ID)
     }
 
     private fun subscribeObservers() {

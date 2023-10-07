@@ -25,7 +25,7 @@ class QuizActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_quiz)
-        binding.setLifecycleOwner { this@QuizActivity.lifecycle }
+        binding.lifecycleOwner = this@QuizActivity
 
 
 

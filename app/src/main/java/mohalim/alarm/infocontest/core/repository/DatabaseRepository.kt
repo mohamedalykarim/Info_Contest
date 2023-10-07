@@ -9,4 +9,5 @@ interface DatabaseRepository {
     suspend fun login(username : String, password: String) : DataState<AuthSignInResult>
     suspend fun addQuestion(question: Question): DataState<Boolean>
     suspend fun getNewQuestions(lastRetrieveTime : Long) : DataState<List<Question>>
+    suspend fun getDataFromGoogleSheet(googleApiKey: String, sheetId: String) : Flow<DataState<List<Question>>>
 }

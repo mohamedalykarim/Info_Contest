@@ -18,10 +18,12 @@ class MyApp : Application(), Configuration.Provider {
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
-    override fun getWorkManagerConfiguration() =
-        Configuration.Builder()
+
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder()
             .setWorkerFactory(workerFactory)
             .build()
+
 
 
     override fun onCreate() {
@@ -38,6 +40,7 @@ class MyApp : Application(), Configuration.Provider {
             Log.e("Amplify", "Could not initialize Amplify", e)
         }
     }
+
 
 
 }

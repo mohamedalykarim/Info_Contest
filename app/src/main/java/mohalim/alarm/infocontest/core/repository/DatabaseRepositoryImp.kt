@@ -4,16 +4,20 @@ import android.util.Log
 import com.amplifyframework.auth.result.AuthSignInResult
 import com.amplifyframework.core.Amplify
 import com.amplifyframework.core.model.query.Where
-import mohalim.alarm.infocontest.core.data_source.aws.AWSDatabase
-import javax.inject.Inject
-
 import com.amplifyframework.datastore.generated.model.Questions
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import mohalim.alarm.infocontest.core.data_source.aws.AWSDatabase
+import mohalim.alarm.infocontest.core.data_source.retrofit.UserInterfaceRetrofit
 import mohalim.alarm.infocontest.core.data_source.room.QuestionDao
 import mohalim.alarm.infocontest.core.model.question.Question
 import mohalim.alarm.infocontest.core.model.question.QuestionCacheMapper
 import mohalim.alarm.infocontest.core.utils.DataState
-import java.util.*
+import org.json.JSONObject
+import java.util.Calendar
+import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -21,7 +25,8 @@ import kotlin.coroutines.suspendCoroutine
 class DatabaseRepositoryImp @Inject constructor(
     val questionDao: QuestionDao,
     val questionCacheMapper: QuestionCacheMapper,
-    val data : AWSDatabase
+    val data : AWSDatabase,
+    val userInterfaceRetrofit: UserInterfaceRetrofit
 ) : DatabaseRepository {
 
     override suspend fun login(username: String, password: String): DataState<AuthSignInResult> = suspendCoroutine {continuation->
@@ -111,6 +116,30 @@ class DatabaseRepositoryImp @Inject constructor(
             it.resume(DataState.Failure(exception))
 
         }
+    }
+
+    override suspend fun getDataFromGoogleSheet(
+        googleApiKey: String,
+        sheetId: String
+    ): Flow<DataState<List<Question>>> {
+        return flow {
+            try {
+                val response = userInterfaceRetrofit.getDatabase(sheetId, googleApiKey)
+                val jsonObject = JSONObject(response.body()!!.string())
+                val array = jsonObject.getJSONArray("values")
+
+                for (i in 0 until array.length()){
+                    val item = array.getJSONArray(i)
+                    for (x in 0 until item.length()){
+                        Log.d("TAG", "getDataFromGoogleSheet: "+ item.get(x))
+                    }
+                }
+
+            }catch (e : Exception){
+                Log.d("TAG", "getDataFromGoogleSheet: "+e.message)
+                emit(DataState.Failure(e))
+            }
+        }.flowOn(Dispatchers.IO)
     }
 
 

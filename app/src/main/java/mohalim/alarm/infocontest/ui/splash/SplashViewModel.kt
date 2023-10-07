@@ -80,5 +80,13 @@ class SplashViewModel @Inject constructor(
         
     }
 
+    fun getDataFromGoogleSheet(googleApiKey: String, sheetId: String) {
+        viewModelScope.launch {
+            databaseRepositoryImp.getDataFromGoogleSheet(googleApiKey, sheetId).collect{
+
+            }
+        }
+    }
+
 
 }
