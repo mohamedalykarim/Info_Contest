@@ -5,7 +5,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 
 import dagger.hilt.components.SingletonComponent
-import mohalim.alarm.infocontest.core.data_source.aws.AWSDatabase
 import mohalim.alarm.infocontest.core.data_source.retrofit.UserInterfaceRetrofit
 import mohalim.alarm.infocontest.core.data_source.room.QuestionDao
 import mohalim.alarm.infocontest.core.model.question.QuestionCacheMapper
@@ -32,10 +31,9 @@ class RepositoryModule {
     fun provideDatabaseRepository(
         questionDao: QuestionDao,
         questionCacheMapper: QuestionCacheMapper,
-        data : AWSDatabase,
         userInterfaceRetrofit: UserInterfaceRetrofit
     ) : DatabaseRepository {
-        return DatabaseRepositoryImp(questionDao, questionCacheMapper, data, userInterfaceRetrofit)
+        return DatabaseRepositoryImp(questionDao, questionCacheMapper, userInterfaceRetrofit)
     }
 
 }

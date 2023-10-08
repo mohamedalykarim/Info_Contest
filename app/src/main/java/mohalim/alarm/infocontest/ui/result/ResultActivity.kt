@@ -2,7 +2,6 @@ package mohalim.alarm.infocontest.ui.result
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import androidx.databinding.DataBindingUtil
 import mohalim.alarm.infocontest.R
 import mohalim.alarm.infocontest.databinding.ActivityResultBinding

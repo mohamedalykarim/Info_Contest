@@ -20,8 +20,7 @@ class AddQuestionViewModel @Inject constructor(val databaseRepository: DatabaseR
     fun addQuestion(question: Question) {
         viewModelScope.launch {
 
-            val addQuestionResult = databaseRepository.addQuestion(question)
-            _addQuestionDataState.value = addQuestionResult
+
         }
 
     }
