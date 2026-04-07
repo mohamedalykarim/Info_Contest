@@ -7,12 +7,10 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mohalim.alarm.infocontest.core.data_source.room.QuestionDao
 import mohalim.alarm.infocontest.core.model.question.QuestionCacheMapper
-import mohalim.contest.alarm.core.repository.DatabaseRepositoryImp
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    val databaseRepositoryImp : DatabaseRepositoryImp,
     val questionDao: QuestionDao,
     val questionCacheMapper: QuestionCacheMapper
 
@@ -24,8 +22,6 @@ class HomeViewModel @Inject constructor(
 
     private val _loadingProgress : MutableLiveData<Int> = MutableLiveData()
     val loadingProgress : LiveData<Int> get() = _loadingProgress
-
-
 
 
 

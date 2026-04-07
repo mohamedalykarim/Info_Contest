@@ -23,6 +23,7 @@ class CahcheDatabaseModule {
             AppCacheDatabase::class.java,
             AppCacheDatabase.DATABASE_NAME
         )
+            .createFromAsset("database.db")
             .fallbackToDestructiveMigration()
             .build()
     }

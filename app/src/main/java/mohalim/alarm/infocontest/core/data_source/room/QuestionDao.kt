@@ -11,10 +11,16 @@ interface QuestionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(questionCache: QuestionCache) : Long
 
-    @Query("SELECT * FROM question")
+    @Query("SELECT * FROM questions")
     suspend fun getAll() : List<QuestionCache>
 
-    @Query("SELECT * FROM question WHERE type = :type ORDER BY RANDOM() LIMIT :limit")
+
+    @Query("SELECT COUNT(*) FROM questions")
+    suspend fun getCountAll() : Int
+
+
+
+    @Query("SELECT * FROM questions WHERE type = :type ORDER BY RANDOM() LIMIT :limit")
     suspend fun getQuestionsFromCategory(type: Int, limit: Int): List<QuestionCache>
 
 }

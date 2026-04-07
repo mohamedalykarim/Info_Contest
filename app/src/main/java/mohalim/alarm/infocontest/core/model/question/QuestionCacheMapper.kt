@@ -14,8 +14,9 @@ class QuestionCacheMapper @Inject constructor(): EntityMapper<QuestionCache, Que
             answer2 = entity.answer2,
             answer3 = entity.answer3,
             answer4 = entity.answer4,
+            answer5 = entity.answer5,
             correctAnswer = entity.correctAnswer,
-            comment =  entity.comment,
+            extraInfo =  entity.extraInfo,
             isAnswered = false
         )
 
@@ -30,8 +31,9 @@ class QuestionCacheMapper @Inject constructor(): EntityMapper<QuestionCache, Que
             answer2 = domainModel.answer2,
             answer3 = domainModel.answer3,
             answer4 = domainModel.answer4,
+            answer5 = domainModel.answer5,
             correctAnswer = domainModel.correctAnswer,
-            comment =  domainModel.comment,
+            extraInfo =  domainModel.extraInfo,
         )
     }
 

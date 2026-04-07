@@ -4,11 +4,11 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "question")
+@Entity(tableName = "questions")
 data class QuestionCache(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    var id : String,
+    var id : Int,
 
     @ColumnInfo(name = "type")
     var type : Int,
@@ -28,9 +28,12 @@ data class QuestionCache(
     @ColumnInfo(name = "answer4")
     var answer4 : String,
 
+    @ColumnInfo(name = "answer5")
+    var answer5 : String,
+
     @ColumnInfo(name = "correct_answer")
     var correctAnswer : String,
 
-    @ColumnInfo(name = "comment")
-    var comment : String
+    @ColumnInfo(name = "extra_info")
+    var extraInfo : String
 )

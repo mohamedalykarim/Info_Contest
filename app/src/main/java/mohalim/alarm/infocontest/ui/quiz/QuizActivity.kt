@@ -1,536 +1,389 @@
 package mohalim.alarm.infocontest.ui.quiz
 
 import android.content.Intent
-import android.graphics.Color
 import android.media.MediaPlayer
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.CountDownTimer
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.databinding.DataBindingUtil
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.VolumeOff
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import dagger.hilt.android.AndroidEntryPoint
 import mohalim.alarm.infocontest.R
-import mohalim.alarm.infocontest.databinding.ActivityQuizBinding
 import mohalim.alarm.infocontest.ui.result.ResultActivity
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class QuizActivity : AppCompatActivity() {
+class QuizActivity : ComponentActivity() {
     private val QUIZ_TYPE: String = "quiz_type"
-    val viewModel : QuizViewModel by viewModels()
-    private lateinit var timer : CountDownTimer
-    lateinit var binding : ActivityQuizBinding
-
+    val viewModel: QuizViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_quiz)
-        binding.lifecycleOwner = this@QuizActivity
+        val type = intent.getIntExtra(QUIZ_TYPE, 1)
+        viewModel.retrieveQuestionForQuiz(type, this)
 
-
-
-        val type =  intent.getIntExtra(QUIZ_TYPE, 1)
-        binding.viewmodel = viewModel
-
-        initTitle(type)
-        clicks()
-
-        viewModel.retrieveQuestionForQuiz(type, binding, this)
-
-
-    }
-
-    private fun initTitle(type: Int) {
-        when (type) {
-            1 -> {
-                binding.titleTv.text = "العواصم"
-            }
-            2 -> {
-                binding.titleTv.text = "التاريخ"
-            }
-            3 -> {
-                binding.titleTv.text = "الجغرافيا"
-            }
-            4 -> {
-                binding.titleTv.text = "الأدب"
-            }
-            5 -> {
-                binding.titleTv.text = "الرياضة"
-            }
-            6 -> {
-                binding.titleTv.text = "العلوم"
-            }
-        }
-    }
-
-    private fun clicks() {
-        binding.choice1Btn.setOnClickListener {
-            binding.choice1Btn.isClickable = false
-            binding.choice2Btn.isClickable = false
-            binding.choice3Btn.isClickable = false
-            binding.choice4Btn.isClickable = false
-            binding.choice1Btn.setBackgroundResource(R.drawable.rounded_shape_4)
-
-            var mediaPlayer = MediaPlayer.create(this@QuizActivity, R.raw.button_answer)
-
-            if (viewModel.isAudioEnabled){
-                mediaPlayer.start()
-                mediaPlayer.setOnCompletionListener {
-                    mediaPlayer.stop()
-                    mediaPlayer.release()
+        setContent {
+            QuizScreen(viewModel, type) { correct, wrong ->
+                val intent = Intent(this@QuizActivity, ResultActivity::class.java).apply {
+                    putExtra("CORRECT", correct)
+                    putExtra("WRONG", wrong)
                 }
-            }
-
-
-            // Correct Answer
-            if(binding.choice1Text.text.toString() == viewModel.currentQuestion.correctAnswer){
-                timer = object : CountDownTimer(2000,100){
-                    override fun onTick(millisUntilFinished: Long) {
-                        if (millisUntilFinished in 301..399){
-                            binding.choice1Btn.setBackgroundResource(R.drawable.rounded_shape_correct_answer)
-
-                            if (viewModel.isAudioEnabled) {
-                                mediaPlayer =
-                                    MediaPlayer.create(this@QuizActivity, R.raw.correct_answer)
-                                mediaPlayer.start()
-                                mediaPlayer.setOnCompletionListener {
-                                    mediaPlayer.stop()
-                                    mediaPlayer.release()
-                                }
-                            }
-
-                        } else if (millisUntilFinished in 201..299){
-                            binding.choice1Btn.setBackgroundResource(R.drawable.rounded_shape_3)
-                        }else if (millisUntilFinished in 101..199){
-                            binding.choice1Btn.setBackgroundResource(R.drawable.rounded_shape_correct_answer)
-
-                        }
-                     }
-
-                    override fun onFinish() {
-                        viewModel.currentQuestion.isAnswered = true
-                    }
-
-                }
-                timer.start()
-                viewModel.correctAnswersCount++
-
-
-            }
-            // Wrong Answer
-            else{
-
-                timer = object : CountDownTimer(2000,100){
-                    override fun onTick(millisUntilFinished: Long) {
-                        if (millisUntilFinished in 301..399){
-                            binding.choice1Text.setTextColor(Color.parseColor("#ffffff"))
-                            binding.choice1Btn.setBackgroundResource(R.drawable.rounded_shape_wrong_answer)
-
-                            if(viewModel.isAudioEnabled){
-                                mediaPlayer = MediaPlayer.create(this@QuizActivity, R.raw.wrong_answer)
-                                mediaPlayer.start()
-                                mediaPlayer.setOnCompletionListener {
-                                    mediaPlayer.stop()
-                                    mediaPlayer.release()
-                                }
-                            }
-
-                        } else if (millisUntilFinished in 201..299){
-                            binding.choice1Text.setTextColor(Color.parseColor("#ffffff"))
-                            binding.choice1Btn.setBackgroundResource(R.drawable.rounded_shape_3)
-                        }else if (millisUntilFinished in 101..199){
-                            binding.choice1Text.setTextColor(Color.parseColor("#ffffff"))
-                            binding.choice1Btn.setBackgroundResource(R.drawable.rounded_shape_wrong_answer)
-                        }
-                    }
-
-                    override fun onFinish() {
-
-                        when (viewModel.currentQuestion.correctAnswer) {
-                            binding.choice2Text.text.toString() -> {
-                                binding.choice2Btn.setBackgroundResource(R.drawable.rounded_shape_correct_answer)
-                            }
-                            binding.choice3Text.text.toString() -> {
-                                binding.choice3Btn.setBackgroundResource(R.drawable.rounded_shape_correct_answer)
-                            }
-                            binding.choice4Text.text.toString() -> {
-                                binding.choice4Btn.setBackgroundResource(R.drawable.rounded_shape_correct_answer)
-                            }
-                        }
-
-                        viewModel.currentQuestion.isAnswered = true
-                    }
-
-                }
-                timer.start()
-                viewModel.wrongAnswersCount++
-
-
-            }
-
-
-
-
-        }
-
-        binding.choice2Btn.setOnClickListener {
-            binding.choice1Btn.isClickable = false
-            binding.choice2Btn.isClickable = false
-            binding.choice3Btn.isClickable = false
-            binding.choice4Btn.isClickable = false
-            binding.choice2Btn.setBackgroundResource(R.drawable.rounded_shape_4)
-
-            var mediaPlayer = MediaPlayer.create(this@QuizActivity, R.raw.button_answer)
-
-            if (viewModel.isAudioEnabled){
-                mediaPlayer.start()
-                mediaPlayer.setOnCompletionListener {
-                    mediaPlayer.stop()
-                    mediaPlayer.release()
-                }
-            }
-
-            // Correct Answer
-            if(binding.choice2Text.text.toString() == viewModel.currentQuestion.correctAnswer){
-
-
-
-                timer = object : CountDownTimer(2000,100){
-                    override fun onTick(millisUntilFinished: Long) {
-                        if (millisUntilFinished in 301..399){
-                            binding.choice2Btn.setBackgroundResource(R.drawable.rounded_shape_correct_answer)
-
-                            if (viewModel.isAudioEnabled){
-                                mediaPlayer = MediaPlayer.create(this@QuizActivity, R.raw.correct_answer)
-                                mediaPlayer.start()
-                                mediaPlayer.setOnCompletionListener {
-                                    mediaPlayer.stop()
-                                    mediaPlayer.release()
-                                }
-                            }
-
-                        } else if (millisUntilFinished in 201..299){
-                            binding.choice2Btn.setBackgroundResource(R.drawable.rounded_shape_3)
-                        }else if (millisUntilFinished in 101..199){
-                            binding.choice2Btn.setBackgroundResource(R.drawable.rounded_shape_correct_answer)
-                        }
-                    }
-
-                    override fun onFinish() {
-                        viewModel.currentQuestion.isAnswered = true
-                    }
-
-                }
-                timer.start()
-                viewModel.correctAnswersCount++
-            }
-            // Wrong Answer
-            else{
-
-
-
-                timer = object : CountDownTimer(2000,100){
-                    override fun onTick(millisUntilFinished: Long) {
-                        if (millisUntilFinished in 301..399){
-                            binding.choice2Text.setTextColor(Color.parseColor("#ffffff"))
-                            binding.choice2Btn.setBackgroundResource(R.drawable.rounded_shape_wrong_answer)
-
-                            if (viewModel.isAudioEnabled){
-                                mediaPlayer = MediaPlayer.create(this@QuizActivity, R.raw.wrong_answer)
-                                mediaPlayer.start()
-                                mediaPlayer.setOnCompletionListener {
-                                    mediaPlayer.stop()
-                                    mediaPlayer.release()
-                                }
-                            }
-
-                        } else if (millisUntilFinished in 201..299){
-                            binding.choice2Text.setTextColor(Color.parseColor("#ffffff"))
-                            binding.choice2Btn.setBackgroundResource(R.drawable.rounded_shape_3)
-                        }else if (millisUntilFinished in 101..199){
-                            binding.choice2Text.setTextColor(Color.parseColor("#ffffff"))
-                            binding.choice2Btn.setBackgroundResource(R.drawable.rounded_shape_wrong_answer)
-                        }
-                    }
-
-                    override fun onFinish() {
-                        when (viewModel.currentQuestion.correctAnswer) {
-                            binding.choice1Text.text.toString() -> {
-                                binding.choice1Btn.setBackgroundResource(R.drawable.rounded_shape_correct_answer)
-                            }
-                            binding.choice3Text.text.toString() -> {
-                                binding.choice3Btn.setBackgroundResource(R.drawable.rounded_shape_correct_answer)
-                            }
-                            binding.choice4Text.text.toString() -> {
-                                binding.choice4Btn.setBackgroundResource(R.drawable.rounded_shape_correct_answer)
-                            }
-                        }
-
-                        viewModel.currentQuestion.isAnswered = true
-                    }
-
-                }
-                timer.start()
-                viewModel.wrongAnswersCount++
-            }
-        }
-
-        binding.choice3Btn.setOnClickListener {
-            binding.choice1Btn.isClickable = false
-            binding.choice2Btn.isClickable = false
-            binding.choice3Btn.isClickable = false
-            binding.choice4Btn.isClickable = false
-            binding.choice3Btn.setBackgroundResource(R.drawable.rounded_shape_4)
-
-            var mediaPlayer = MediaPlayer.create(this@QuizActivity, R.raw.button_answer)
-
-            if (viewModel.isAudioEnabled){
-                mediaPlayer.start()
-                mediaPlayer.setOnCompletionListener {
-                    mediaPlayer.stop()
-                    mediaPlayer.release()
-                }
-            }
-
-            // Correct Answer
-            if(binding.choice3Text.text.toString() == viewModel.currentQuestion.correctAnswer){
-
-
-
-                timer = object : CountDownTimer(2000,100){
-                    override fun onTick(millisUntilFinished: Long) {
-                        if (millisUntilFinished in 301..399){
-                            binding.choice3Btn.setBackgroundResource(R.drawable.rounded_shape_correct_answer)
-
-                            if (viewModel.isAudioEnabled){
-                                mediaPlayer = MediaPlayer.create(this@QuizActivity, R.raw.correct_answer)
-                                mediaPlayer.start()
-                                mediaPlayer.setOnCompletionListener {
-                                    mediaPlayer.stop()
-                                    mediaPlayer.release()
-                                }
-                            }
-
-                        } else if (millisUntilFinished in 201..299){
-                            binding.choice3Btn.setBackgroundResource(R.drawable.rounded_shape_3)
-                        }else if (millisUntilFinished in 101..199){
-                            binding.choice3Btn.setBackgroundResource(R.drawable.rounded_shape_correct_answer)
-                        }
-                    }
-
-                    override fun onFinish() {
-                        viewModel.currentQuestion.isAnswered = true
-                    }
-
-                }
-                timer.start()
-                viewModel.correctAnswersCount++
-            }
-            // Wrong Answer
-            else{
-
-                timer = object : CountDownTimer(2000,100){
-                    override fun onTick(millisUntilFinished: Long) {
-                        if (millisUntilFinished in 301..399){
-                            binding.choice3Text.setTextColor(Color.parseColor("#ffffff"))
-                            binding.choice3Btn.setBackgroundResource(R.drawable.rounded_shape_wrong_answer)
-
-                            if (viewModel.isAudioEnabled){
-                                mediaPlayer = MediaPlayer.create(this@QuizActivity, R.raw.wrong_answer)
-                                mediaPlayer.start()
-                                mediaPlayer.setOnCompletionListener {
-                                    mediaPlayer.stop()
-                                    mediaPlayer.release()
-                                }
-                            }
-
-                        } else if (millisUntilFinished in 201..299){
-                            binding.choice3Text.setTextColor(Color.parseColor("#ffffff"))
-                            binding.choice3Btn.setBackgroundResource(R.drawable.rounded_shape_3)
-                        }else if (millisUntilFinished in 101..199){
-                            binding.choice3Text.setTextColor(Color.parseColor("#ffffff"))
-                            binding.choice3Btn.setBackgroundResource(R.drawable.rounded_shape_wrong_answer)
-                        }
-                    }
-
-                    override fun onFinish() {
-                        when (viewModel.currentQuestion.correctAnswer) {
-                            binding.choice1Text.text.toString() -> {
-                                binding.choice1Btn.setBackgroundResource(R.drawable.rounded_shape_correct_answer)
-                            }
-                            binding.choice2Text.text.toString() -> {
-                                binding.choice2Btn.setBackgroundResource(R.drawable.rounded_shape_correct_answer)
-                            }
-                            binding.choice4Text.text.toString() -> {
-                                binding.choice4Btn.setBackgroundResource(R.drawable.rounded_shape_correct_answer)
-                            }
-                        }
-
-                        viewModel.currentQuestion.isAnswered = true
-                    }
-
-                }
-                timer.start()
-                viewModel.wrongAnswersCount++
-
-            }
-        }
-
-        binding.choice4Btn.setOnClickListener {
-            binding.choice1Btn.isClickable = false
-            binding.choice2Btn.isClickable = false
-            binding.choice3Btn.isClickable = false
-            binding.choice4Btn.isClickable = false
-            binding.choice4Btn.setBackgroundResource(R.drawable.rounded_shape_4)
-
-
-            var mediaPlayer = MediaPlayer.create(this@QuizActivity, R.raw.button_answer)
-
-            if (viewModel.isAudioEnabled){
-                mediaPlayer.start()
-                mediaPlayer.setOnCompletionListener {
-                    mediaPlayer.stop()
-                    mediaPlayer.release()
-                }
-            }
-
-            // Correct Answer
-            if(binding.choice4Text.text.toString() == viewModel.currentQuestion.correctAnswer){
-
-
-
-                timer = object : CountDownTimer(2000,100){
-                    override fun onTick(millisUntilFinished: Long) {
-                        if (millisUntilFinished in 301..399){
-                            binding.choice4Btn.setBackgroundResource(R.drawable.rounded_shape_correct_answer)
-
-                            if (viewModel.isAudioEnabled){
-                                mediaPlayer = MediaPlayer.create(this@QuizActivity, R.raw.correct_answer)
-                                mediaPlayer.start()
-                                mediaPlayer.setOnCompletionListener {
-                                    mediaPlayer.stop()
-                                    mediaPlayer.release()
-                                }
-                            }
-
-                        } else if (millisUntilFinished in 201..299){
-                            binding.choice4Btn.setBackgroundResource(R.drawable.rounded_shape_3)
-                        }else if (millisUntilFinished in 101..199){
-                            binding.choice4Btn.setBackgroundResource(R.drawable.rounded_shape_correct_answer)
-                        }
-                    }
-
-                    override fun onFinish() {
-                        viewModel.currentQuestion.isAnswered = true
-                    }
-
-                }
-                timer.start()
-                viewModel.correctAnswersCount++
-            }
-            // Wrong Answer
-            else{
-
-
-
-                timer = object : CountDownTimer(2000,100){
-                    override fun onTick(millisUntilFinished: Long) {
-                        if (millisUntilFinished in 301..399){
-                            binding.choice4Text.setTextColor(Color.parseColor("#ffffff"))
-                            binding.choice4Btn.setBackgroundResource(R.drawable.rounded_shape_wrong_answer)
-
-                            if (viewModel.isAudioEnabled){
-                                mediaPlayer = MediaPlayer.create(this@QuizActivity, R.raw.wrong_answer)
-                                mediaPlayer.start()
-                                mediaPlayer.setOnCompletionListener {
-                                    mediaPlayer.stop()
-                                    mediaPlayer.release()
-                                }
-                            }
-
-                        } else if (millisUntilFinished in 201..299){
-                            binding.choice4Text.setTextColor(Color.parseColor("#ffffff"))
-                            binding.choice4Btn.setBackgroundResource(R.drawable.rounded_shape_3)
-                        }else if (millisUntilFinished in 101..199){
-                            binding.choice4Text.setTextColor(Color.parseColor("#ffffff"))
-                            binding.choice4Btn.setBackgroundResource(R.drawable.rounded_shape_wrong_answer)
-                        }
-                    }
-
-                    override fun onFinish() {
-
-                        when (viewModel.currentQuestion.correctAnswer) {
-                            binding.choice1Text.text.toString() -> {
-                                binding.choice1Btn.setBackgroundResource(R.drawable.rounded_shape_correct_answer)
-                            }
-                            binding.choice2Text.text.toString() -> {
-                                binding.choice2Btn.setBackgroundResource(R.drawable.rounded_shape_correct_answer)
-                            }
-                            binding.choice3Text.text.toString() -> {
-                                binding.choice3Btn.setBackgroundResource(R.drawable.rounded_shape_correct_answer)
-                            }
-                        }
-
-                        viewModel.currentQuestion.isAnswered = true
-                    }
-
-                }
-                timer.start()
-                viewModel.wrongAnswersCount++
-            }
-        }
-
-        binding.nextBtn.setOnClickListener {
-            if (!viewModel.currentQuestion.isAnswered){
-                return@setOnClickListener
-            }
-
-            if (viewModel.currentQuestionNumber == 25 ){
-                val intent = Intent(this@QuizActivity,  ResultActivity::class.java)
-                intent.putExtra("CORRECT", viewModel.correctAnswersCount)
-                intent.putExtra("WRONG", viewModel.wrongAnswersCount)
-
-                finish()
                 startActivity(intent)
-
-                return@setOnClickListener
-            }
-
-            if (viewModel.currentQuestionNumber == 24 ){
-                binding.nextBtn.text = "النتيجة"
-            }
-
-            viewModel.currentQuestion = viewModel.questions[viewModel.currentQuestionNumber]
-            viewModel.currentQuestionNumber++
-            binding.invalidateAll()
-
-            binding.choice1Btn.isClickable = true
-            binding.choice2Btn.isClickable = true
-            binding.choice3Btn.isClickable = true
-            binding.choice4Btn.isClickable = true
-
-            binding.choice1Btn.setBackgroundResource(R.drawable.rounded_shape_3)
-            binding.choice2Btn.setBackgroundResource(R.drawable.rounded_shape_3)
-            binding.choice3Btn.setBackgroundResource(R.drawable.rounded_shape_3)
-            binding.choice4Btn.setBackgroundResource(R.drawable.rounded_shape_3)
-
-            binding.choice1Text.setTextColor(Color.parseColor("#642ea8"))
-            binding.choice2Text.setTextColor(Color.parseColor("#642ea8"))
-            binding.choice3Text.setTextColor(Color.parseColor("#642ea8"))
-            binding.choice4Text.setTextColor(Color.parseColor("#642ea8"))
-
-            timer.cancel()
-
-        }
-
-        binding.audioBtn.setOnClickListener {
-            if (viewModel.isAudioEnabled){
-                viewModel.isAudioEnabled = false
-                binding.audioBtn.setImageResource(R.drawable.audio_not_active)
-            }else{
-                viewModel.isAudioEnabled = true
-                binding.audioBtn.setImageResource(R.drawable.audio_active)
+                finish()
             }
         }
+    }
+}
 
+@Composable
+fun QuizScreen(viewModel: QuizViewModel, type: Int, onFinish: (Int, Int) -> Unit) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var showExtraInfoDialog by remember { mutableStateOf(false) }
+
+    val title = remember(type) {
+        when (type) {
+            1 -> "العواصم"
+            2 -> "التاريخ"
+            3 -> "الجغرافيا"
+            4 -> "الأدب"
+            5 -> "الرياضة"
+            6 -> "العلوم"
+            else -> "مسابقة"
+        }
+    }
+
+    fun playSound(resId: Int) {
+        if (viewModel.isAudioEnabled) {
+            try {
+                val mediaPlayer = MediaPlayer.create(context, resId)
+                mediaPlayer.start()
+                mediaPlayer.setOnCompletionListener {
+                    it.release()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.linearGradient(
+                    colors = listOf(Color(0xFF564CE9), Color(0xFFB66CB6))
+                )
+            )
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { 
+                        Text(
+                            text = title, 
+                            modifier = Modifier.fillMaxWidth(), 
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold
+                        ) 
+                    },
+                    backgroundColor = Color.Transparent,
+                    contentColor = Color.White,
+                    elevation = 0.dp,
+                    actions = {
+                        IconButton(onClick = { viewModel.isAudioEnabled = !viewModel.isAudioEnabled }) {
+                            Icon(
+                                imageVector = if (viewModel.isAudioEnabled) Icons.AutoMirrored.Filled.VolumeUp else Icons.AutoMirrored.Filled.VolumeOff,
+                                contentDescription = "Audio"
+                            )
+                        }
+                    }
+                )
+            },
+            backgroundColor = Color.Transparent
+        ) { padding ->
+            Column(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxSize()
+                    .padding(horizontal = 20.dp)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Progress Section
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = Color.White.copy(alpha = 0.2f),
+                ) {
+                    Text(
+                        text = "السؤال ${viewModel.currentQuestionNumber} / 25",
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Question Section
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    elevation = 8.dp,
+                    shape = RoundedCornerShape(25.dp),
+                    backgroundColor = Color.White
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = viewModel.currentQuestion.questionText,
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
+                            lineHeight = 28.sp,
+                            color = Color(0xFF1A1A1A)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Choices Section (All 5 answers shuffled)
+                val choices = remember(viewModel.currentQuestion) {
+                    listOf(
+                        viewModel.currentQuestion.answer1,
+                        viewModel.currentQuestion.answer2,
+                        viewModel.currentQuestion.answer3,
+                        viewModel.currentQuestion.answer4,
+                        viewModel.currentQuestion.answer5
+                    ).filter { it.isNotBlank() && it != "Loading..." }
+                     .shuffled()
+                }
+
+                choices.forEachIndexed { index, choice ->
+                    ChoiceButton(
+                        text = choice,
+                        index = index + 1,
+                        isSelected = viewModel.selectedAnswer == choice,
+                        isCorrect = viewModel.currentQuestion.correctAnswer == choice,
+                        showResult = viewModel.showCorrectAnswer,
+                        enabled = viewModel.selectedAnswer == null,
+                        onClick = {
+                            viewModel.selectedAnswer = choice
+                            playSound(R.raw.button_answer)
+                            
+                            scope.launch {
+                                delay(300) 
+                                viewModel.showCorrectAnswer = true
+                                if (choice == viewModel.currentQuestion.correctAnswer) {
+                                    viewModel.correctAnswersCount++
+                                    playSound(R.raw.correct_answer)
+                                } else {
+                                    viewModel.wrongAnswersCount++
+                                    playSound(R.raw.wrong_answer)
+                                }
+                                
+                                delay(1200) 
+                                viewModel.currentQuestion = viewModel.currentQuestion.copy(isAnswered = true)
+                                // Show info dialog after answer is processed
+                                showExtraInfoDialog = true
+                            }
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+                
+                Spacer(modifier = Modifier.height(40.dp))
+            }
+        }
+    }
+
+    // Extra Info Dialog
+    if (showExtraInfoDialog) {
+        Dialog(onDismissRequest = {
+            showExtraInfoDialog = false
+            if (viewModel.currentQuestionNumber == 25) {
+                onFinish(viewModel.correctAnswersCount, viewModel.wrongAnswersCount)
+            } else {
+                viewModel.nextQuestion()
+            }
+        }) {
+            Card(
+                shape = RoundedCornerShape(24.dp),
+                elevation = 16.dp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "معلومة إضافية",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Black,
+                        color = Color(0xFF564CE9)
+                    )
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    Text(
+                        text = viewModel.currentQuestion.extraInfo,
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Center,
+                        lineHeight = 26.sp,
+                        color = Color.DarkGray
+                    )
+                    
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
+                    Button(
+                        onClick = {
+                            showExtraInfoDialog = false
+                            if (viewModel.currentQuestionNumber == 25) {
+                                onFinish(viewModel.correctAnswersCount, viewModel.wrongAnswersCount)
+                            } else {
+                                viewModel.nextQuestion()
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        shape = RoundedCornerShape(25.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color(0xFF564CE9),
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text(
+                            text = if (viewModel.currentQuestionNumber == 25) "النتيجة" else "السؤال التالي",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ChoiceButton(
+    text: String,
+    index: Int,
+    isSelected: Boolean,
+    isCorrect: Boolean,
+    showResult: Boolean,
+    enabled: Boolean,
+    onClick: () -> Unit
+) {
+    var isFlickerOn by remember { mutableStateOf(false) }
+
+    LaunchedEffect(showResult) {
+        if (showResult && (isCorrect || isSelected)) {
+            repeat(4) {
+                isFlickerOn = true
+                delay(80)
+                isFlickerOn = false
+                delay(80)
+            }
+            isFlickerOn = true 
+        } else {
+            isFlickerOn = false
+        }
+    }
+
+    val backgroundColor = when {
+        showResult && isFlickerOn && isCorrect -> Color(0xFF4CAF50)
+        showResult && isFlickerOn && isSelected && !isCorrect -> Color(0xFFF44336)
+        isSelected -> Color(0xFF9575CD).copy(alpha = 0.9f)
+        else -> Color.White.copy(alpha = 0.9f)
+    }
+
+    val contentColor = when {
+        showResult && isFlickerOn && (isCorrect || isSelected) -> Color.White
+        isSelected -> Color.White
+        else -> Color(0xFF642EA8)
+    }
+
+    val numberBgColor = when {
+        showResult && isFlickerOn && (isCorrect || isSelected) -> Color.White.copy(alpha = 0.3f)
+        isSelected -> Color.White.copy(alpha = 0.3f)
+        else -> Color(0xFF564CE9).copy(alpha = 0.1f)
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .clickable(enabled = enabled, onClick = onClick),
+        elevation = if (isSelected) 8.dp else 2.dp,
+        shape = RoundedCornerShape(20.dp),
+        backgroundColor = backgroundColor
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp, horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Styled Numbering
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .background(numberBgColor, CircleShape)
+                    .border(1.dp, contentColor.copy(alpha = 0.3f), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = index.toString(),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = contentColor
+                )
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Text(
+                text = text,
+                fontSize = 17.sp,
+                textAlign = TextAlign.Start,
+                color = contentColor,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.weight(1f)
+            )
+        }
     }
 }
