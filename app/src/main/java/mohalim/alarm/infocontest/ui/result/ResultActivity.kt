@@ -2,6 +2,7 @@ package mohalim.alarm.infocontest.ui.result
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -27,13 +28,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import mohalim.alarm.infocontest.R
 import mohalim.alarm.infocontest.ui.main.MainActivity
+import mohalim.alarm.infocontest.ui.theme.InfoContestTheme
 
 class ResultActivity : ComponentActivity() {
+    private var mInterstitialAd: InterstitialAd? = null
+    private val TAG = "ResultActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        loadInterstitialAd()
 
         val correct = intent.getIntExtra("CORRECT", 0)
         val wrong = intent.getIntExtra("WRONG", 0)
@@ -41,17 +52,55 @@ class ResultActivity : ComponentActivity() {
         val percentage = if (allCount > 0) (correct.toDouble() / allCount.toDouble()) * 100 else 0.0
 
         setContent {
-            MaterialTheme {
+            InfoContestTheme {
                 ResultScreen(
                     correct = correct,
                     wrong = wrong,
                     percentage = percentage.toInt(),
                     onBackToHome = {
-                        startActivity(Intent(this, MainActivity::class.java))
-                        finish()
+                        showInterstitialAd {
+                            startActivity(Intent(this, MainActivity::class.java))
+                            finish()
+                        }
                     }
                 )
             }
+        }
+    }
+
+    private fun loadInterstitialAd() {
+        val adRequest = AdRequest.Builder().build()
+        InterstitialAd.load(this, "ca-app-pub-5350581213670869/7827700968", adRequest,
+            object : InterstitialAdLoadCallback() {
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    Log.d(TAG, adError.toString())
+                    mInterstitialAd = null
+                }
+
+                override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                    Log.d(TAG, "Ad was loaded.")
+                    mInterstitialAd = interstitialAd
+                }
+            })
+    }
+
+    private fun showInterstitialAd(onAdDismissed: () -> Unit) {
+        if (mInterstitialAd != null) {
+            mInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+                override fun onAdDismissedFullScreenContent() {
+                    Log.d(TAG, "Ad was dismissed.")
+                    onAdDismissed()
+                }
+
+                override fun onAdFailedToShowFullScreenContent(adError: com.google.android.gms.ads.AdError) {
+                    Log.d(TAG, "Ad failed to show.")
+                    onAdDismissed()
+                }
+            }
+            mInterstitialAd?.show(this)
+        } else {
+            Log.d(TAG, "The interstitial ad wasn't ready yet.")
+            onAdDismissed()
         }
     }
 }

@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import com.google.android.gms.ads.MobileAds
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -19,8 +20,10 @@ class MyApp : Application(), Configuration.Provider {
             .setWorkerFactory(workerFactory)
             .build()
 
-
-
+    override fun onCreate() {
+        super.onCreate()
+        MobileAds.initialize(this) {}
+    }
 
 
 }

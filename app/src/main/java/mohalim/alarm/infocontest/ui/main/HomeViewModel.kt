@@ -1,6 +1,5 @@
 package mohalim.alarm.infocontest.ui.main
 
-import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,10 +14,6 @@ class HomeViewModel @Inject constructor(
     val questionCacheMapper: QuestionCacheMapper
 
 ) : ViewModel() {
-
-
-    val LAST_RETRIEVE_TIME = longPreferencesKey("LAST_RETRIEVE_TIME")
-    var lastTimeRetrieved : Long = 0
 
     private val _loadingProgress : MutableLiveData<Int> = MutableLiveData()
     val loadingProgress : LiveData<Int> get() = _loadingProgress

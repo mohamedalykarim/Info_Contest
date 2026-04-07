@@ -29,12 +29,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 import dagger.hilt.android.AndroidEntryPoint
 import mohalim.alarm.infocontest.R
 import mohalim.alarm.infocontest.ui.result.ResultActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import mohalim.alarm.infocontest.ui.theme.InfoContestTheme
 
 @AndroidEntryPoint
 class QuizActivity : ComponentActivity() {
@@ -47,13 +52,15 @@ class QuizActivity : ComponentActivity() {
         viewModel.retrieveQuestionForQuiz(type, this)
 
         setContent {
-            QuizScreen(viewModel, type) { correct, wrong ->
-                val intent = Intent(this@QuizActivity, ResultActivity::class.java).apply {
-                    putExtra("CORRECT", correct)
-                    putExtra("WRONG", wrong)
+            InfoContestTheme {
+                QuizScreen(viewModel, type) { correct, wrong ->
+                    val intent = Intent(this@QuizActivity, ResultActivity::class.java).apply {
+                        putExtra("CORRECT", correct)
+                        putExtra("WRONG", wrong)
+                    }
+                    startActivity(intent)
+                    finish()
                 }
-                startActivity(intent)
-                finish()
             }
         }
     }
@@ -130,100 +137,108 @@ fun QuizScreen(viewModel: QuizViewModel, type: Int, onFinish: (Int, Int) -> Unit
                 modifier = Modifier
                     .padding(padding)
                     .fillMaxSize()
-                    .padding(horizontal = 20.dp)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Progress Section
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = Color.White.copy(alpha = 0.2f),
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 20.dp)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        text = "السؤال ${viewModel.currentQuestionNumber} / 25",
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                }
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // Question Section
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    elevation = 8.dp,
-                    shape = RoundedCornerShape(25.dp),
-                    backgroundColor = Color.White
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(24.dp),
-                        contentAlignment = Alignment.Center
+                    // Progress Section
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = Color.White.copy(alpha = 0.2f),
                     ) {
                         Text(
-                            text = viewModel.currentQuestion.questionText,
-                            fontSize = 20.sp,
-                            textAlign = TextAlign.Center,
+                            text = "السؤال ${viewModel.currentQuestionNumber} / 25",
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                            fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
-                            lineHeight = 28.sp,
-                            color = Color(0xFF1A1A1A)
+                            color = Color.White
                         )
                     }
-                }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
 
-                // Choices Section (All 5 answers shuffled)
-                val choices = remember(viewModel.currentQuestion) {
-                    listOf(
-                        viewModel.currentQuestion.answer1,
-                        viewModel.currentQuestion.answer2,
-                        viewModel.currentQuestion.answer3,
-                        viewModel.currentQuestion.answer4,
-                        viewModel.currentQuestion.answer5
-                    ).filter { it.isNotBlank() && it != "Loading..." }
-                     .shuffled()
-                }
-
-                choices.forEachIndexed { index, choice ->
-                    ChoiceButton(
-                        text = choice,
-                        index = index + 1,
-                        isSelected = viewModel.selectedAnswer == choice,
-                        isCorrect = viewModel.currentQuestion.correctAnswer == choice,
-                        showResult = viewModel.showCorrectAnswer,
-                        enabled = viewModel.selectedAnswer == null,
-                        onClick = {
-                            viewModel.selectedAnswer = choice
-                            playSound(R.raw.button_answer)
-                            
-                            scope.launch {
-                                delay(300) 
-                                viewModel.showCorrectAnswer = true
-                                if (choice == viewModel.currentQuestion.correctAnswer) {
-                                    viewModel.correctAnswersCount++
-                                    playSound(R.raw.correct_answer)
-                                } else {
-                                    viewModel.wrongAnswersCount++
-                                    playSound(R.raw.wrong_answer)
-                                }
-                                
-                                delay(1200) 
-                                viewModel.currentQuestion = viewModel.currentQuestion.copy(isAnswered = true)
-                                // Show info dialog after answer is processed
-                                showExtraInfoDialog = true
-                            }
+                    // Question Section
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        elevation = 8.dp,
+                        shape = RoundedCornerShape(25.dp),
+                        backgroundColor = Color.White
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(24.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = viewModel.currentQuestion.questionText,
+                                fontSize = 20.sp,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                                lineHeight = 28.sp,
+                                color = Color(0xFF1A1A1A)
+                            )
                         }
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // Choices Section (All 5 answers shuffled)
+                    val choices = remember(viewModel.currentQuestion) {
+                        listOf(
+                            viewModel.currentQuestion.answer1,
+                            viewModel.currentQuestion.answer2,
+                            viewModel.currentQuestion.answer3,
+                            viewModel.currentQuestion.answer4,
+                            viewModel.currentQuestion.answer5
+                        ).filter { it.isNotBlank() && it != "Loading..." }
+                         .shuffled()
+                    }
+
+                    choices.forEachIndexed { index, choice ->
+                        ChoiceButton(
+                            text = choice,
+                            index = index + 1,
+                            isSelected = viewModel.selectedAnswer == choice,
+                            isCorrect = viewModel.currentQuestion.correctAnswer == choice,
+                            showResult = viewModel.showCorrectAnswer,
+                            enabled = viewModel.selectedAnswer == null,
+                            onClick = {
+                                viewModel.selectedAnswer = choice
+                                playSound(R.raw.button_answer)
+                                
+                                scope.launch {
+                                    delay(300) 
+                                    viewModel.showCorrectAnswer = true
+                                    if (choice == viewModel.currentQuestion.correctAnswer) {
+                                        viewModel.correctAnswersCount++
+                                        playSound(R.raw.correct_answer)
+                                    } else {
+                                        viewModel.wrongAnswersCount++
+                                        playSound(R.raw.wrong_answer)
+                                    }
+                                    
+                                    delay(1200) 
+                                    viewModel.currentQuestion = viewModel.currentQuestion.copy(isAnswered = true)
+                                    // Show info dialog after answer is processed
+                                    showExtraInfoDialog = true
+                                }
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+                    
+                    Spacer(modifier = Modifier.height(40.dp))
                 }
-                
-                Spacer(modifier = Modifier.height(40.dp))
+
+                // Ad Banner at the bottom
+                AdBanner(adUnitId = "ca-app-pub-5350581213670869/9740817357")
             }
         }
     }
@@ -296,6 +311,22 @@ fun QuizScreen(viewModel: QuizViewModel, type: Int, onFinish: (Int, Int) -> Unit
             }
         }
     }
+}
+
+@Composable
+fun AdBanner(adUnitId: String) {
+    AndroidView(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp),
+        factory = { context ->
+            AdView(context).apply {
+                setAdSize(AdSize.BANNER)
+                this.adUnitId = adUnitId
+                loadAd(AdRequest.Builder().build())
+            }
+        }
+    )
 }
 
 @Composable

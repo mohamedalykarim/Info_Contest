@@ -7,22 +7,16 @@ plugins {
 }
 
 android {
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         applicationId "mohalim.alarm.infocontest"
         minSdk 24
-        targetSdk 35
+        targetSdk 36
         versionCode 6
         versionName "1.06"
         multiDexEnabled true
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
-        Properties properties = new Properties()
-        properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-        buildConfigField "String", "API_KEY", "\"${properties.getProperty('API_KEY')}\""
     }
 
     buildFeatures {
@@ -64,7 +58,8 @@ dependencies {
 
     implementation 'com.android.support:multidex:1.0.3'
 
-
+    // Google AdMob
+    implementation 'com.google.android.gms:play-services-ads:23.6.0'
 
 
     implementation "com.google.dagger:hilt-android:2.51.1"
@@ -105,9 +100,6 @@ dependencies {
 
     // Support for Java 8 features
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
-
-    implementation "androidx.datastore:datastore-preferences:1.1.1"
-
 
 
     implementation 'com.squareup.retrofit2:retrofit:2.11.0'

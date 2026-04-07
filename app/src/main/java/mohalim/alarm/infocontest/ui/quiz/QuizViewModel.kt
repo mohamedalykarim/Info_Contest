@@ -7,10 +7,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.longPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +17,6 @@ import mohalim.alarm.infocontest.core.model.question.QuestionCacheMapper
 import mohalim.contest.alarm.core.repository.QuestionRepositoryImp
 import javax.inject.Inject
 
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "APP")
 
 @HiltViewModel
 class QuizViewModel @Inject constructor(
@@ -30,8 +25,6 @@ class QuizViewModel @Inject constructor(
     val questionCacheMapper: QuestionCacheMapper
 ) : ViewModel() {
 
-    val LAST_RETRIEVE_TIME = longPreferencesKey("LAST_RETRIEVE_TIME")
-    var lastTimeRetrieved: Long = 0
 
     var currentQuestion by mutableStateOf(
         Question(0, 1, "Loading...", "Loading...", "Loading...", "Loading...", "Loading...", "Loading...", "", "", false)
@@ -44,6 +37,7 @@ class QuizViewModel @Inject constructor(
     var wrongAnswersCount by mutableIntStateOf(0)
 
     var isAudioEnabled by mutableStateOf(true)
+    var shuffled by mutableStateOf(false)
 
     var selectedAnswer by mutableStateOf<String?>(null)
     var showCorrectAnswer by mutableStateOf(false)

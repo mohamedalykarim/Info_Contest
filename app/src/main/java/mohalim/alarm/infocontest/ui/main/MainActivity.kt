@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,11 +24,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 import dagger.hilt.android.AndroidEntryPoint
 import mohalim.alarm.infocontest.R
 import mohalim.alarm.infocontest.ui.quiz.QuizActivity
+import mohalim.alarm.infocontest.ui.theme.InfoContestTheme
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -39,7 +43,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme {
+            InfoContestTheme {
                 MainScreen(
                     onCategoryClick = { type -> startTheQuiz(type) },
                 )
@@ -86,91 +90,115 @@ fun MainScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp)
-                .verticalScroll(rememberScrollState())
         ) {
-            Spacer(modifier = Modifier.height(32.dp))
-            Text(
-                text = "Welcome guest, ",
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp
-            )
-            Text(
-                text = "Choose a category",
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 22.sp
-            )
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(rememberScrollState())
             ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    CategoryItem(
-                        title = "العواصم",
-                        iconRes = R.drawable.capital_icon,
-                        isClickable = clickedType == -1,
-                        onClick = {
-                            clickedType = 1
-                            onCategoryClick(1)
-                        }
-                    )
-                    CategoryItem(
-                        title = "الجغرافيا",
-                        iconRes = R.drawable.geography_icon,
-                        isClickable = clickedType == -1,
-                        onClick = {
-                            clickedType = 3
-                            onCategoryClick(3)
-                        }
-                    )
-                    CategoryItem(
-                        title = "الرياضة",
-                        iconRes = R.drawable.sports_icon,
-                        isClickable = clickedType == -1,
-                        onClick = {
-                            clickedType = 5
-                            onCategoryClick(5)
-                        }
-                    )
+                Spacer(modifier = Modifier.height(32.dp))
+                Text(
+                    text = "Welcome guest, ",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp
+                )
+                Text(
+                    text = "Choose a category",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 22.sp
+                )
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        CategoryItem(
+                            title = "العواصم",
+                            iconRes = R.drawable.capital_icon,
+                            isClickable = clickedType == -1,
+                            onClick = {
+                                clickedType = 1
+                                onCategoryClick(1)
+                            }
+                        )
+                        CategoryItem(
+                            title = "الجغرافيا",
+                            iconRes = R.drawable.geography_icon,
+                            isClickable = clickedType == -1,
+                            onClick = {
+                                clickedType = 3
+                                onCategoryClick(3)
+                            }
+                        )
+                        CategoryItem(
+                            title = "الرياضة",
+                            iconRes = R.drawable.sports_icon,
+                            isClickable = clickedType == -1,
+                            onClick = {
+                                clickedType = 5
+                                onCategoryClick(5)
+                            }
+                        )
+                    }
+                    Column(modifier = Modifier.weight(1f)) {
+                        CategoryItem(
+                            title = "التاريخ",
+                            iconRes = R.drawable.history_icon,
+                            isClickable = clickedType == -1,
+                            onClick = {
+                                clickedType = 2
+                                onCategoryClick(2)
+                            }
+                        )
+                        CategoryItem(
+                            title = "الأدب",
+                            iconRes = R.drawable.literature_icon,
+                            isClickable = clickedType == -1,
+                            onClick = {
+                                clickedType = 4
+                                onCategoryClick(4)
+                            }
+                        )
+                        CategoryItem(
+                            title = "العلوم",
+                            iconRes = R.drawable.science_icon,
+                            isClickable = clickedType == -1,
+                            onClick = {
+                                clickedType = 6
+                                onCategoryClick(6)
+                            }
+                        )
+                    }
                 }
-                Column(modifier = Modifier.weight(1f)) {
-                    CategoryItem(
-                        title = "التاريخ",
-                        iconRes = R.drawable.history_icon,
-                        isClickable = clickedType == -1,
-                        onClick = {
-                            clickedType = 2
-                            onCategoryClick(2)
-                        }
-                    )
-                    CategoryItem(
-                        title = "الأدب",
-                        iconRes = R.drawable.literature_icon,
-                        isClickable = clickedType == -1,
-                        onClick = {
-                            clickedType = 4
-                            onCategoryClick(4)
-                        }
-                    )
-                    CategoryItem(
-                        title = "العلوم",
-                        iconRes = R.drawable.science_icon,
-                        isClickable = clickedType == -1,
-                        onClick = {
-                            clickedType = 6
-                            onCategoryClick(6)
-                        }
-                    )
-                }
+
+                Spacer(modifier = Modifier.height(32.dp))
             }
-            
-            Spacer(modifier = Modifier.height(100.dp))
+
+            // Ad Banner at the bottom
+            AdBanner(adUnitId = "ca-app-pub-5350581213670869/9740817357")
         }
     }
+}
+
+@Composable
+fun AdBanner(adUnitId: String) {
+    AndroidView(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp),
+        factory = { context ->
+            AdView(context).apply {
+                setAdSize(AdSize.BANNER)
+                this.adUnitId = adUnitId
+                loadAd(AdRequest.Builder().build())
+            }
+        }
+    )
 }
 
 @Composable
