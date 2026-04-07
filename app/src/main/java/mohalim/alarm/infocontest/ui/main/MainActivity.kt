@@ -99,13 +99,13 @@ fun MainScreen(
             ) {
                 Spacer(modifier = Modifier.height(32.dp))
                 Text(
-                    text = "Welcome guest, ",
+                    text = "أهلا بك، ",
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp
                 )
                 Text(
-                    text = "Choose a category",
+                    text = "اختار القسم المفضل لك",
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     fontSize = 22.sp
