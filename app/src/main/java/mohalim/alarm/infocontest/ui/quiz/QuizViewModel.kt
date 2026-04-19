@@ -37,7 +37,8 @@ class QuizViewModel @Inject constructor(
     var wrongAnswersCount by mutableIntStateOf(0)
 
     var isAudioEnabled by mutableStateOf(true)
-    var shuffled by mutableStateOf(false)
+
+    var shuffledAnswers by mutableStateOf<List<String>>(emptyList())
 
     var selectedAnswer by mutableStateOf<String?>(null)
     var showCorrectAnswer by mutableStateOf(false)
@@ -51,14 +52,26 @@ class QuizViewModel @Inject constructor(
                 }
                 questions.clear()
                 questions.addAll(it)
-                currentQuestion = questions[0]
+                updateCurrentQuestion(0)
             }
         }
     }
 
+    private fun updateCurrentQuestion(index: Int) {
+        val question = questions[index]
+        currentQuestion = question
+        shuffledAnswers = listOf(
+            question.answer1,
+            question.answer2,
+            question.answer3,
+            question.answer4,
+            question.answer5
+        ).filter { it.isNotBlank() && it != "Loading..." }.shuffled()
+    }
+
     fun nextQuestion() {
         if (currentQuestionNumber < questions.size) {
-            currentQuestion = questions[currentQuestionNumber]
+            updateCurrentQuestion(currentQuestionNumber)
             currentQuestionNumber++
             selectedAnswer = null
             showCorrectAnswer = false

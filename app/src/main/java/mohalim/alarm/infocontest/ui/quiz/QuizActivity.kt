@@ -189,19 +189,8 @@ fun QuizScreen(viewModel: QuizViewModel, type: Int, onFinish: (Int, Int) -> Unit
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Choices Section (All 5 answers shuffled)
-                    val choices = remember(viewModel.currentQuestion) {
-                        listOf(
-                            viewModel.currentQuestion.answer1,
-                            viewModel.currentQuestion.answer2,
-                            viewModel.currentQuestion.answer3,
-                            viewModel.currentQuestion.answer4,
-                            viewModel.currentQuestion.answer5
-                        ).filter { it.isNotBlank() && it != "Loading..." }
-                         .shuffled()
-                    }
-
-                    choices.forEachIndexed { index, choice ->
+                    // Choices Section (Using pre-shuffled answers from ViewModel)
+                    viewModel.shuffledAnswers.forEachIndexed { index, choice ->
                         ChoiceButton(
                             text = choice,
                             index = index + 1,

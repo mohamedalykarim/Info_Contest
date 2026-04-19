@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,6 +25,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -40,11 +42,10 @@ import mohalim.alarm.infocontest.ui.theme.InfoContestTheme
 class ResultActivity : ComponentActivity() {
     private var mInterstitialAd: InterstitialAd? = null
     private val TAG = "ResultActivity"
+    private var showResult = mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        loadInterstitialAd()
 
         val correct = intent.getIntExtra("CORRECT", 0)
         val wrong = intent.getIntExtra("WRONG", 0)
@@ -53,33 +54,63 @@ class ResultActivity : ComponentActivity() {
 
         setContent {
             InfoContestTheme {
-                ResultScreen(
-                    correct = correct,
-                    wrong = wrong,
-                    percentage = percentage.toInt(),
-                    onBackToHome = {
-                        showInterstitialAd {
+                if (showResult.value) {
+                    ResultScreen(
+                        correct = correct,
+                        wrong = wrong,
+                        percentage = percentage.toInt(),
+                        onBackToHome = {
                             startActivity(Intent(this, MainActivity::class.java))
                             finish()
                         }
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(Color(0xFF564CE9), Color(0xFFB66CB6))
+                                )
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            CircularProgressIndicator(color = Color.White)
+                            Text(
+                                text = stringResource(R.string.result_is_loading),
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     }
-                )
+                }
             }
+        }
+
+        loadInterstitialAd {
+            showResult.value = true
         }
     }
 
-    private fun loadInterstitialAd() {
+    private fun loadInterstitialAd(onComplete: () -> Unit) {
         val adRequest = AdRequest.Builder().build()
         InterstitialAd.load(this, "ca-app-pub-5350581213670869/7827700968", adRequest,
             object : InterstitialAdLoadCallback() {
                 override fun onAdFailedToLoad(adError: LoadAdError) {
                     Log.d(TAG, adError.toString())
                     mInterstitialAd = null
+                    onComplete()
                 }
 
                 override fun onAdLoaded(interstitialAd: InterstitialAd) {
                     Log.d(TAG, "Ad was loaded.")
                     mInterstitialAd = interstitialAd
+                    showInterstitialAd(onComplete)
                 }
             })
     }

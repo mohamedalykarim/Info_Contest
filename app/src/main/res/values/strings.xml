@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Cultural Quiz</string>
+    <string name="result_is_loading">جاري تحميل النتيجة الان</string>
 </resources>
