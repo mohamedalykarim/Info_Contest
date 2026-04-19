@@ -23,4 +23,6 @@ interface QuestionDao {
     @Query("SELECT * FROM questions WHERE type = :type ORDER BY RANDOM() LIMIT :limit")
     suspend fun getQuestionsFromCategory(type: Int, limit: Int): List<QuestionCache>
 
+    @Query("SELECT DISTINCT type FROM questions")
+    suspend fun getAllCategories(): List<Int>
 }

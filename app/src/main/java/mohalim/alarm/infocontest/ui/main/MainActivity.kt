@@ -32,6 +32,7 @@ import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import dagger.hilt.android.AndroidEntryPoint
 import mohalim.alarm.infocontest.R
+import mohalim.alarm.infocontest.ui.other_topics.OtherTopicsActivity
 import mohalim.alarm.infocontest.ui.quiz.QuizActivity
 import mohalim.alarm.infocontest.ui.theme.InfoContestTheme
 
@@ -46,6 +47,7 @@ class MainActivity : ComponentActivity() {
             InfoContestTheme {
                 MainScreen(
                     onCategoryClick = { type -> startTheQuiz(type) },
+                    onOtherTopicsClick = { startOtherTopics() }
                 )
             }
         }
@@ -56,11 +58,17 @@ class MainActivity : ComponentActivity() {
         intent.putExtra(QUIZ_TYPE, type)
         startActivity(intent)
     }
+
+    private fun startOtherTopics() {
+        val intent = Intent(this, OtherTopicsActivity::class.java)
+        startActivity(intent)
+    }
 }
 
 @Composable
 fun MainScreen(
     onCategoryClick: (Int) -> Unit,
+    onOtherTopicsClick: () -> Unit
 ) {
     // Reset clicked state when returning to this screen
     var clickedType by remember { mutableIntStateOf(-1) }
@@ -110,11 +118,11 @@ fun MainScreen(
                     fontWeight = FontWeight.Bold,
                     fontSize = 22.sp
                 )
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         CategoryItem(
@@ -176,6 +184,24 @@ fun MainScreen(
                     }
                 }
 
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Other Topics Icon
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CategoryItem(
+                        title = "موضوعات أخرى",
+                        iconRes = R.drawable.title, // Using title image as icon for other topics
+                        isClickable = clickedType == -1,
+                        onClick = {
+                            clickedType = 100
+                            onOtherTopicsClick()
+                        }
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(32.dp))
             }
 
@@ -211,16 +237,16 @@ fun CategoryItem(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .padding(vertical = 4.dp)
             .clickable(enabled = isClickable) { onClick() },
         contentAlignment = Alignment.TopCenter
     ) {
-        // The rounded background shape (#62449a, 30dp corners)
+        // The rounded background shape (#62449a, 25dp corners) - slightly smaller
         Box(
             modifier = Modifier
-                .padding(top = 30.dp)
-                .size(width = 170.dp, height = 140.dp)
-                .background(Color(0xFF62449A), RoundedCornerShape(30.dp))
+                .padding(top = 25.dp)
+                .size(width = 150.dp, height = 120.dp)
+                .background(Color(0xFF62449A), RoundedCornerShape(25.dp))
         )
 
         Column(
@@ -229,12 +255,13 @@ fun CategoryItem(
             Image(
                 painter = painterResource(id = iconRes),
                 contentDescription = title,
-                modifier = Modifier.size(120.dp)
+                modifier = Modifier.size(100.dp)
             )
             Text(
                 text = title,
                 color = Color.White,
-                fontSize = 16.sp
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold
             )
         }
     }
