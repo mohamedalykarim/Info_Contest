@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import mohalim.alarm.infocontest.core.data_source.room.QuestionDao
 import mohalim.alarm.infocontest.core.model.question.Question
 import mohalim.alarm.infocontest.core.model.question.QuestionCacheMapper
+import mohalim.alarm.infocontest.core.utils.PreferencesManager
 import mohalim.contest.alarm.core.repository.QuestionRepositoryImp
 import javax.inject.Inject
 
@@ -22,7 +23,8 @@ import javax.inject.Inject
 class QuizViewModel @Inject constructor(
     val repositoryImp: QuestionRepositoryImp,
     val questionDao: QuestionDao,
-    val questionCacheMapper: QuestionCacheMapper
+    val questionCacheMapper: QuestionCacheMapper,
+    val preferencesManager: PreferencesManager
 ) : ViewModel() {
 
 
@@ -44,10 +46,11 @@ class QuizViewModel @Inject constructor(
     var showCorrectAnswer by mutableStateOf(false)
 
     fun retrieveQuestionForQuiz(type: Int, context: Context) {
+        val targetCount = preferencesManager.getQuestionsCount()
         viewModelScope.launch {
             repositoryImp.getQuestionsForQuiz(type).collect {
                 if (it.isEmpty()) return@collect
-                if (it.size < 25) {
+                if (it.size < targetCount) {
                     Toast.makeText(context, "رجاء المحاولة بعد قليل يتم الان تحميل البيانات", Toast.LENGTH_LONG).show()
                 }
                 questions.clear()
@@ -58,6 +61,7 @@ class QuizViewModel @Inject constructor(
     }
 
     private fun updateCurrentQuestion(index: Int) {
+        if (index >= questions.size) return
         val question = questions[index]
         currentQuestion = question
         shuffledAnswers = listOf(

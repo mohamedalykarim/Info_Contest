@@ -12,7 +12,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +38,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mohalim.alarm.infocontest.R
 import mohalim.alarm.infocontest.ui.other_topics.OtherTopicsActivity
 import mohalim.alarm.infocontest.ui.quiz.QuizActivity
+import mohalim.alarm.infocontest.ui.settings.SettingsActivity
 import mohalim.alarm.infocontest.ui.theme.InfoContestTheme
 
 @AndroidEntryPoint
@@ -47,7 +52,8 @@ class MainActivity : ComponentActivity() {
             InfoContestTheme {
                 MainScreen(
                     onCategoryClick = { type -> startTheQuiz(type) },
-                    onOtherTopicsClick = { startOtherTopics() }
+                    onOtherTopicsClick = { startOtherTopics() },
+                    onSettingsClick = { startSettings() }
                 )
             }
         }
@@ -63,12 +69,18 @@ class MainActivity : ComponentActivity() {
         val intent = Intent(this, OtherTopicsActivity::class.java)
         startActivity(intent)
     }
+
+    private fun startSettings() {
+        val intent = Intent(this, SettingsActivity::class.java)
+        startActivity(intent)
+    }
 }
 
 @Composable
 fun MainScreen(
     onCategoryClick: (Int) -> Unit,
-    onOtherTopicsClick: () -> Unit
+    onOtherTopicsClick: () -> Unit,
+    onSettingsClick: () -> Unit
 ) {
     // Reset clicked state when returning to this screen
     var clickedType by remember { mutableIntStateOf(-1) }
@@ -105,19 +117,38 @@ fun MainScreen(
                     .padding(horizontal = 16.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                Spacer(modifier = Modifier.height(32.dp))
-                Text(
-                    text = "أهلا بك، ",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp
-                )
-                Text(
-                    text = "اختار القسم المفضل لك",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 22.sp
-                )
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = "أهلا بك، ",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
+                        )
+                        Text(
+                            text = "اختار القسم المفضل لك",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 22.sp
+                        )
+                    }
+                    
+                    IconButton(onClick = onSettingsClick) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "Settings",
+                            tint = Color.White,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Row(
@@ -126,8 +157,8 @@ fun MainScreen(
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         CategoryItem(
-                            title = "العواصم",
-                            iconRes = R.drawable.capital_icon,
+                            title = "المعلومات الدينية",
+                            iconRes = R.drawable.quran_icon,
                             isClickable = clickedType == -1,
                             onClick = {
                                 clickedType = 1
@@ -191,15 +222,45 @@ fun MainScreen(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CategoryItem(
-                        title = "موضوعات أخرى",
-                        iconRes = R.drawable.title, // Using title image as icon for other topics
-                        isClickable = clickedType == -1,
-                        onClick = {
-                            clickedType = 100
-                            onOtherTopicsClick()
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp, horizontal = 12.dp)
+                            .clickable(enabled = true) {
+                                clickedType = 100
+                                onOtherTopicsClick()
+                            },
+                        contentAlignment = Alignment.TopCenter
+                    ) {
+                        // The rounded background shape (#62449a, 25dp corners) - slightly smaller
+                        Box(
+                            modifier = Modifier
+                                .padding(top = 25.dp)
+                                .fillMaxWidth()
+                                .height(120.dp)
+                                .background(Color(0xFF62449A), RoundedCornerShape(25.dp))
+                        )
+
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.other),
+                                contentDescription = "موضوعات أخرى",
+                                modifier = Modifier.size(100.dp)
+                            )
+                            Text(
+                                text = "موضوعات أخرى",
+                                color = Color.White,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
-                    )
+                    }
+
+
+
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))

@@ -21,6 +21,9 @@
             android:value="ca-app-pub-5350581213670869~9169276951"/>
 
         <activity
+            android:name=".ui.settings.SettingsActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.add_question.AddQuestionActivity"
             android:exported="false" />
         <activity

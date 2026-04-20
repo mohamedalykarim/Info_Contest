@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -22,11 +23,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dagger.hilt.android.AndroidEntryPoint
+import mohalim.alarm.infocontest.R
 import mohalim.alarm.infocontest.ui.quiz.QuizActivity
 import mohalim.alarm.infocontest.ui.theme.InfoContestTheme
 
@@ -115,14 +118,27 @@ fun OtherTopicsScreen(
 @Composable
 fun OtherCategoryItem(type: Int, onClick: () -> Unit) {
     val title = when(type){
-        1 -> "العواصم"
+        1 -> "المعلومات الدينية"
         2 -> "التاريخ"
         3 -> "الجغرافيا"
         4 -> "الأدب"
         5 -> "الرياضة"
         6 -> "العلوم"
+        7 -> "العواصم"
         else -> "موضوع $type"
     }
+
+    val iconRes = when(type){
+        1 -> R.drawable.quran_icon
+        2 -> R.drawable.history_icon
+        3 -> R.drawable.geography_icon
+        4 -> R.drawable.literature_icon
+        5 -> R.drawable.sports_icon
+        6 -> R.drawable.science_icon
+        7 -> R.drawable.capital_icon
+        else -> R.drawable.other
+    }
+
 
     Card(
         shape = RoundedCornerShape(20.dp),
@@ -130,17 +146,23 @@ fun OtherCategoryItem(type: Int, onClick: () -> Unit) {
         elevation = 4.dp,
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp)
             .clickable { onClick() }
     ) {
-        Box(contentAlignment = Alignment.Center) {
+
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = iconRes),
+                contentDescription = title,
+                modifier = Modifier.size(100.dp)
+            )
             Text(
                 text = title,
                 color = Color.White,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(8.dp)
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold
             )
         }
     }

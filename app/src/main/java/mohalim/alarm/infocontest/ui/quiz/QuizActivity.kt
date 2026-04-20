@@ -7,7 +7,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -21,7 +20,6 @@ import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -71,6 +69,8 @@ fun QuizScreen(viewModel: QuizViewModel, type: Int, onFinish: (Int, Int) -> Unit
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var showExtraInfoDialog by remember { mutableStateOf(false) }
+
+    val totalQuestions = viewModel.questions.size
 
     val title = remember(type) {
         when (type) {
@@ -153,7 +153,7 @@ fun QuizScreen(viewModel: QuizViewModel, type: Int, onFinish: (Int, Int) -> Unit
                         color = Color.White.copy(alpha = 0.2f),
                     ) {
                         Text(
-                            text = "السؤال ${viewModel.currentQuestionNumber} / 25",
+                            text = "السؤال ${viewModel.currentQuestionNumber} / $totalQuestions",
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
@@ -236,7 +236,7 @@ fun QuizScreen(viewModel: QuizViewModel, type: Int, onFinish: (Int, Int) -> Unit
     if (showExtraInfoDialog) {
         Dialog(onDismissRequest = {
             showExtraInfoDialog = false
-            if (viewModel.currentQuestionNumber == 25) {
+            if (viewModel.currentQuestionNumber == totalQuestions) {
                 onFinish(viewModel.correctAnswersCount, viewModel.wrongAnswersCount)
             } else {
                 viewModel.nextQuestion()
@@ -275,7 +275,7 @@ fun QuizScreen(viewModel: QuizViewModel, type: Int, onFinish: (Int, Int) -> Unit
                     Button(
                         onClick = {
                             showExtraInfoDialog = false
-                            if (viewModel.currentQuestionNumber == 25) {
+                            if (viewModel.currentQuestionNumber == totalQuestions) {
                                 onFinish(viewModel.correctAnswersCount, viewModel.wrongAnswersCount)
                             } else {
                                 viewModel.nextQuestion()
@@ -291,13 +291,70 @@ fun QuizScreen(viewModel: QuizViewModel, type: Int, onFinish: (Int, Int) -> Unit
                         )
                     ) {
                         Text(
-                            text = if (viewModel.currentQuestionNumber == 25) "النتيجة" else "السؤال التالي",
+                            text = if (viewModel.currentQuestionNumber == totalQuestions) "النتيجة" else "السؤال التالي",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun ChoiceButton(
+    text: String,
+    index: Int,
+    isSelected: Boolean,
+    isCorrect: Boolean,
+    showResult: Boolean,
+    enabled: Boolean,
+    onClick: () -> Unit
+) {
+    val backgroundColor = when {
+        showResult && isCorrect -> Color(0xFF4CAF50)
+        showResult && isSelected && !isCorrect -> Color(0xFFE57373)
+        isSelected -> Color(0xFF564CE9).copy(alpha = 0.8f)
+        else -> Color.White
+    }
+
+    val contentColor = if (isSelected || (showResult && isCorrect)) Color.White else Color(0xFF1A1A1A)
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(enabled = enabled) { onClick() },
+        shape = RoundedCornerShape(15.dp),
+        elevation = 4.dp,
+        backgroundColor = backgroundColor
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Surface(
+                shape = CircleShape,
+                color = if (isSelected || (showResult && isCorrect)) Color.White.copy(alpha = 0.2f) else Color(0xFFF5F5F5),
+                modifier = Modifier.size(32.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Text(
+                        text = index.toString(),
+                        fontWeight = FontWeight.Bold,
+                        color = contentColor
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = text,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = contentColor
+            )
         }
     }
 }
@@ -316,94 +373,4 @@ fun AdBanner(adUnitId: String) {
             }
         }
     )
-}
-
-@Composable
-fun ChoiceButton(
-    text: String,
-    index: Int,
-    isSelected: Boolean,
-    isCorrect: Boolean,
-    showResult: Boolean,
-    enabled: Boolean,
-    onClick: () -> Unit
-) {
-    var isFlickerOn by remember { mutableStateOf(false) }
-
-    LaunchedEffect(showResult) {
-        if (showResult && (isCorrect || isSelected)) {
-            repeat(4) {
-                isFlickerOn = true
-                delay(80)
-                isFlickerOn = false
-                delay(80)
-            }
-            isFlickerOn = true 
-        } else {
-            isFlickerOn = false
-        }
-    }
-
-    val backgroundColor = when {
-        showResult && isFlickerOn && isCorrect -> Color(0xFF4CAF50)
-        showResult && isFlickerOn && isSelected && !isCorrect -> Color(0xFFF44336)
-        isSelected -> Color(0xFF9575CD).copy(alpha = 0.9f)
-        else -> Color.White.copy(alpha = 0.9f)
-    }
-
-    val contentColor = when {
-        showResult && isFlickerOn && (isCorrect || isSelected) -> Color.White
-        isSelected -> Color.White
-        else -> Color(0xFF642EA8)
-    }
-
-    val numberBgColor = when {
-        showResult && isFlickerOn && (isCorrect || isSelected) -> Color.White.copy(alpha = 0.3f)
-        isSelected -> Color.White.copy(alpha = 0.3f)
-        else -> Color(0xFF564CE9).copy(alpha = 0.1f)
-    }
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
-            .clickable(enabled = enabled, onClick = onClick),
-        elevation = if (isSelected) 8.dp else 2.dp,
-        shape = RoundedCornerShape(20.dp),
-        backgroundColor = backgroundColor
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 12.dp, horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Styled Numbering
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .background(numberBgColor, CircleShape)
-                    .border(1.dp, contentColor.copy(alpha = 0.3f), CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = index.toString(),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = contentColor
-                )
-            }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Text(
-                text = text,
-                fontSize = 17.sp,
-                textAlign = TextAlign.Start,
-                color = contentColor,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.weight(1f)
-            )
-        }
-    }
 }
