@@ -99,7 +99,7 @@ class ResultActivity : ComponentActivity() {
 
     private fun loadInterstitialAd(onComplete: () -> Unit) {
         val adRequest = AdRequest.Builder().build()
-        InterstitialAd.load(this, "ca-app-pub-5350581213670869/7827700968", adRequest,
+        InterstitialAd.load(this, "ca-app-pub-535058123670869/7827700968", adRequest,
             object : InterstitialAdLoadCallback() {
                 override fun onAdFailedToLoad(adError: LoadAdError) {
                     Log.d(TAG, adError.toString())

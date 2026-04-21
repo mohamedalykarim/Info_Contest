@@ -2,9 +2,9 @@ package mohalim.alarm.infocontest.ui.main
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -42,7 +42,7 @@ import mohalim.alarm.infocontest.ui.settings.SettingsActivity
 import mohalim.alarm.infocontest.ui.theme.InfoContestTheme
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     private val QUIZ_TYPE: String = "quiz_type"
     val viewModel: HomeViewModel by viewModels()
 

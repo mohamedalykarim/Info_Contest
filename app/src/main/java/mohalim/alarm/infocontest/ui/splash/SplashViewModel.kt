@@ -30,7 +30,7 @@ class SplashViewModel @Inject constructor(
             }
             
             // Artificial delay for splash screen visibility
-            delay(2000)
+            delay(4000)
             _isFinished.value = true
         }
     }

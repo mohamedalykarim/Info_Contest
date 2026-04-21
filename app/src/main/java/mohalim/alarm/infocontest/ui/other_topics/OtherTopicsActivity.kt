@@ -2,9 +2,9 @@ package mohalim.alarm.infocontest.ui.other_topics
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,7 +34,7 @@ import mohalim.alarm.infocontest.ui.quiz.QuizActivity
 import mohalim.alarm.infocontest.ui.theme.InfoContestTheme
 
 @AndroidEntryPoint
-class OtherTopicsActivity : ComponentActivity() {
+class OtherTopicsActivity : AppCompatActivity() {
     private val viewModel: OtherTopicsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {

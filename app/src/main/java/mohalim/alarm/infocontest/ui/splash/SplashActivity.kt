@@ -3,9 +3,9 @@ package mohalim.alarm.infocontest.ui.splash
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -28,7 +28,7 @@ import mohalim.alarm.infocontest.ui.theme.InfoContestTheme
 
 @SuppressLint("CustomSplash")
 @AndroidEntryPoint
-class SplashActivity : ComponentActivity() {
+class SplashActivity : AppCompatActivity() {
     private val viewModel: SplashViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,7 +72,7 @@ fun SplashScreen() {
             Image(
                 painter = painterResource(id = R.drawable.title),
                 contentDescription = null,
-                modifier = Modifier.size(100.dp)
+                modifier = Modifier.size(250.dp)
             )
 
             Spacer(modifier = Modifier.height(8.dp))

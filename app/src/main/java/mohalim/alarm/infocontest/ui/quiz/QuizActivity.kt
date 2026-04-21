@@ -3,9 +3,9 @@ package mohalim.alarm.infocontest.ui.quiz
 import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -40,12 +40,13 @@ import kotlinx.coroutines.launch
 import mohalim.alarm.infocontest.ui.theme.InfoContestTheme
 
 @AndroidEntryPoint
-class QuizActivity : ComponentActivity() {
+class QuizActivity : AppCompatActivity() {
     private val QUIZ_TYPE: String = "quiz_type"
     val viewModel: QuizViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         val type = intent.getIntExtra(QUIZ_TYPE, 1)
         viewModel.retrieveQuestionForQuiz(type, this)
 
